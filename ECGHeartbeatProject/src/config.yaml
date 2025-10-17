@@ -1,0 +1,11 @@
+experiment_name: 'ecg_baseline'
+data_dir: 'data/processed/'
+epochs: 20
+batch_size: 32
+learning_rate: 0.001
+num_classes: 5
+model:
+  type: 'Conv1D'
+  hidden_dim: 64
+optimizer: 'Adam'
+device: 'cuda'
