@@ -1,18 +1,28 @@
+import os
+import json
+from pathlib import Path
+from loguru import logger
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi_mqtt import FastMQTT, MQTTConfig
-import json
 
+BASE_DIR = Path().resolve().parent
+
+load_dotenv(dotenv_path=str(BASE_DIR  / ".env" ))
+MQTT_HOST = os.getenv("MQTT_HOST","localhost")
+MQTT_PORT = MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
+MQTT_USERNAME = os.getenv("MQTT_USERNAME")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
+logger.info("Loaded Environment Variables")
 app = FastAPI()
-MQTT_BROKER = "localhost"
 
-# MQTT_BROKER = "172.16.34.32"
-MQTT_PORT = 1883
-
-# Set MQTT broker address (point to Raspberry Pi IP if broker is there)
 mqtt_config = MQTTConfig(
-    host= MQTT_BROKER, 
-    port= MQTT_PORT,
-    keepalive=60
+    host=MQTT_HOST,
+    port=MQTT_PORT,
+    username=MQTT_USERNAME,
+    password=MQTT_PASSWORD,
+    keepalive=60,
+    ssl=True,  
 )
 
 fast_mqtt = FastMQTT(config = mqtt_config)
@@ -32,7 +42,6 @@ async def handle_message(client, topic, payload, qos, properties):
         print(f"Received on {topic}: {data}")
     except Exception as e:
         print(f"Error decoding message: {e}, Raw payload: {payload}")
-
 
 
 # Optional: Root endpoint

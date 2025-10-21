@@ -1,5 +1,6 @@
 ### Added by me
 data/1
+secrets/
 # Byte-compiled / optimized / compiled files
 __pycache__/
 *.pyc

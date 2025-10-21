@@ -10,6 +10,8 @@ sudo systemctl start mosquitto
 sudo systemctl status mosquitto
 pip install fastapi fastapi-mqtt uvicorn
 uvicorn <python_file_name>:app --host 0.0.0.0 --port 8000
+> uvicorn subscriber:app --host 0.0.0.0 --port 8000
+> python -m uvicorn subscriber:app --host 0.0.0.0 --port 8000
 sudo ss -tulnp | grep 1883
 
 ## in client
