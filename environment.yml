@@ -1,0 +1,13 @@
+name: ecg_project
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - wfdb
+  - kagglehub
+  - pip
+  - pip:
+      - torch  # Will be automatically resolved to GPU or CPU depending on your conda channel

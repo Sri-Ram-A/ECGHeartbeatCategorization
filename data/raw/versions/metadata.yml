@@ -1,0 +1,36 @@
+dataset:
+  name: ECG Heartbeat Categorization Dataset
+  version: 1.0
+  source: https://www.kaggle.com/datasets/shayanfazeli/heartbeat
+  license: CC BY 4.0
+  description: >
+    This dataset is composed of two collections of heartbeat signals derived from
+    the MIT-BIH Arrhythmia Dataset and the PTB Diagnostic ECG Database.
+    Each sample corresponds to a segmented heartbeat.
+
+collections:
+  - name: Arrhythmia Dataset
+    num_samples: 109446
+    num_categories: 5
+    sampling_frequency: 125
+    source: Physionet's MIT-BIH Arrhythmia Dataset
+    classes:
+      N: 0
+      S: 1
+      V: 2
+      F: 3
+      Q: 4
+
+preprocessing:
+  - resampling: 125Hz uniform sampling
+  - segmentation: single heartbeat segments
+  - normalization: applied per sample
+
+intended_use:
+  - heartbeat classification
+  - arrhythmia detection
+  - transfer learning experiments
+
+author:
+  name: Shayan Fazeli
+  institution: University of California, Irvine
