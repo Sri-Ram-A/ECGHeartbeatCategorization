@@ -5,3 +5,7 @@ pyyaml
 tqdm
 wfdb
 kagglehub
+paho-mqtt
+fastapi
+fastapi-mqtt
+uvicorn

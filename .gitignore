@@ -1,6 +1,5 @@
 ### Added by me
-secrets/kaggle.json
-data/raw/datasets/versions/1
+data/1
 # Byte-compiled / optimized / compiled files
 __pycache__/
 *.pyc
