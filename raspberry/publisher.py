@@ -1,12 +1,13 @@
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
 
-import time
+from datetime import datetime
 import json
 import socket
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from getmac import get_mac_address 
 
 BASE_DIR = Path().resolve().parent
 load_dotenv(dotenv_path=str(BASE_DIR  / ".env"))
@@ -26,9 +27,9 @@ client.connect(MQTT_HOST, MQTT_PORT, KEEP_ALIVE)
 client.loop_start()  # start background loop
 
 data = {
-    "sender": socket.gethostname(),
+    "sender": str(socket.gethostname())+str(get_mac_address()),
     "temperature": 30,
-    "timestamp": time.time()
+    "timestamp": str(datetime.now())
 }
 
 result = client.publish(MQTT_TOPIC, json.dumps(data))
