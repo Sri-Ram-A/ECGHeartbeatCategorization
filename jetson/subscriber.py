@@ -46,8 +46,8 @@ async def handle_all_messages(client, topic, payload, qos, properties):
 ## 📢 subscribe: A convenience decorator to subscribe to a specific topic/pattern and handle only messages for that topic.
 @fast_mqtt.subscribe(MQTT_TOPIC)
 async def message_to_specific_topic(client, topic, payload, qos, properties):
-    # data = json.loads(payload.decode())
-    logger.info("Received message to SPECIFIC topic: {}", topic, payload.decode(), qos, properties)
+    data = json.loads(payload.decode())
+    logger.info(f"Received message to SPECIFIC topic: {topic} | {data}")
 
 
 ## 🛑 on_disconnect: Runs when the client disconnects.
