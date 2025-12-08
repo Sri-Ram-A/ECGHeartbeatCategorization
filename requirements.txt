@@ -11,3 +11,5 @@ fastapi-mqtt
 uvicorn
 python-dotenv
 loguru
+getmac
+fastapi[standard]
