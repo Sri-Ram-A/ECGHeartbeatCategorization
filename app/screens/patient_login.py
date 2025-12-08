@@ -7,8 +7,8 @@ from components.form_components import (
     create_card,
     create_info_row
 )
+from components.form_components import create_title_label, create_subtitle_label
 from components.colors import get_colors
-
 
 class PatientLoginScreen(ctk.CTkFrame):
     def __init__(self, parent, app, doctor_data):
@@ -40,43 +40,22 @@ class PatientLoginScreen(ctk.CTkFrame):
         ).pack(anchor="w")
 
         # Title
-        ctk.CTkLabel(
-            main, 
-            text="Patient Session Login",
-            font=ctk.CTkFont(size=28, weight="bold"),
-            text_color=self.colors["text_primary"]
-        ).pack(pady=(20, 10), anchor="w")
-        
-        ctk.CTkLabel(
-            main, 
-            text="Retrieve a patient record to start monitoring",
-            font=ctk.CTkFont(size=14),
-            text_color=self.colors["text_secondary"]
-        ).pack(pady=(0, 30), anchor="w")
-        
-        # Login Card
+        create_title_label(main, "Patient Session Login", self.colors).pack(pady=(20, 10), anchor="w")
+        create_subtitle_label(main, "Retrieve a patient record to start monitoring", self.colors).pack(pady=(0, 30), anchor="w")
         card, card_content = create_card(main, "Retrieve Record", self.colors)
-        
-        form = ctk.CTkFrame(card_content, fg_color="transparent")
-        form.pack(fill="both", expand=True)
 
         # Form Fields
-        _, self.patient_id = create_label_entry(
-            form, "Patient ID", "P-987654", colors=self.colors
-        )
-        _, self.patient_dob = create_label_entry(
-            form, "Date of Birth (YYYY-MM-DD)", "1990-01-01", colors=self.colors
-        )
-        
+        form = ctk.CTkFrame(card_content, fg_color="transparent")
+        form.pack(fill="both", expand=True)
+        _, self.patient_id = create_label_entry(form, "Patient ID", "P-987654", colors=self.colors)
+        _, self.patient_dob = create_label_entry(form, "Date of Birth (YYYY-MM-DD)", "1990-01-01", colors=self.colors)
         self.error_label = ErrorLabel(form, colors=self.colors)
         
         # Buttons
         btn_frame = ctk.CTkFrame(form, fg_color="transparent")
         btn_frame.pack(fill="x", pady=(0, 20))
         
-        login_btn = create_accent_button(
-            btn_frame, "Retrieve Record →", self.login, self.colors
-        )
+        login_btn = create_accent_button(btn_frame, "Retrieve Record →", self.login, self.colors)
         login_btn.pack(side="right")
         
         # Link to Registration

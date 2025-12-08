@@ -46,18 +46,10 @@ class PatientRegistrationScreen(ctk.CTkFrame):
         form.pack(fill="both", expand=True)
 
         # Form Fields
-        _, self.patient_id = create_label_entry(
-            form, "Patient ID (P-XXXX)", "P-900001", colors=self.colors
-        )
-        _, self.name = create_label_entry(
-            form, "Full Name", "Patient Jane Doe", colors=self.colors
-        )
-        _, self.age = create_label_entry(
-            form, "Age", "e.g., 35", colors=self.colors
-        )
-        _, self.phone = create_label_entry(
-            form, "Contact Number", "+1 (555) 123-4567", colors=self.colors
-        )
+        _, self.patient_id = create_label_entry(form, "Patient ID (P-XXXX)", "P-900001", colors=self.colors)
+        _, self.name = create_label_entry(form, "Full Name", "Patient Jane Doe", colors=self.colors)
+        _, self.age = create_label_entry(form, "Age", "e.g., 35", colors=self.colors)
+        _, self.phone = create_label_entry(form, "Contact Number", "+1 (555) 123-4567", colors=self.colors)
         
         self.error_label = ErrorLabel(form, colors=self.colors)
         self.status_label = StatusLabel(form, colors=self.colors)
