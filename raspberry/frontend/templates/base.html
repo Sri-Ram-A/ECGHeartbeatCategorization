@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{ title if title else 'ECG Frontend' }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* light, soft palette */
+      :root{
+        --bg: #f7fbfc;
+        --card: #ffffff;
+        --muted: #6b7280;
+        --accent: #0ea5a4; /* teal */
+        --accent-2: #06b6d4;
+      }
+      body{background:var(--bg);}
+    </style>
+  </head>
+  <body class="min-h-screen font-sans text-gray-800">
+    
+    <header class="bg-transparent py-6">
+      <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
+        <nav class="hidden md:flex gap-4 items-center text-sm">
+          <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
+          <a href="/register/doctor" class="text-teal-600 hover:underline">Doctor</a>
+          <a href="/register/patient" class="text-teal-600 hover:underline">Patient</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto ">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="max-w-4xl mx-auto px-4 py-2 text-sm text-gray-500">
+      <div class="text-center">Health is Wealth</div>
+    </footer>
+  </body>
+</html>
