@@ -1,78 +1,160 @@
-import customtkinter as ctk
-from screens.doctor_login import DoctorLoginScreen
-from components.colors import get_colors
+from pathlib import Path
+from fastapi import FastAPI, Request, Form, Depends
+from typing import Annotated
+from sqlmodel import Session, select
+from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+import models
+import subprocess
+import sys
+
+BASE = Path(__file__).parent
+TEMPLATE_DIR = str(BASE / "templates")
+STATIC_DIR = str(BASE / "static")
+templates = Jinja2Templates(directory=TEMPLATE_DIR)
+app = FastAPI(title="ECG")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# SQLModel dependency
+SessionDep = Annotated[Session, Depends(models.get_session)]
 
 
-class MedicalMonitorApp(ctk.CTk):
-    def __init__(self):
-        super().__init__()
-        self.title("HeartRace - Professional Healthcare System")
-        self.geometry("1200x750")
-        self.minsize(900, 600)
-        ctk.set_appearance_mode("light")
-        ctk.set_default_color_theme("blue")
-        colors = get_colors(is_dark_mode=False)
-        # Main container for header and content
-        main_container = ctk.CTkFrame(self, fg_color="transparent")
-        main_container.pack(fill="both", expand=True)
-        
-        # --- TOP HEADER BAR ---
-        self.header_frame = ctk.CTkFrame(
-            main_container, 
-            height=60, 
-            fg_color=colors["card_background"],
-            border_width=1,
-            border_color=colors["border"]
-        )
-        self.header_frame.pack(side="top", fill="x")
-        self.header_frame.pack_propagate(False)
-        # Title and Header Content
-        header_content = ctk.CTkFrame(self.header_frame, fg_color="transparent")
-        header_content.pack(fill="both", expand=True, padx=25, pady=10)
-        # Left: Title
-        ctk.CTkLabel(
-            header_content, 
-            text="HeartRace ♡",
-            font=ctk.CTkFont(size=24, weight="bold"),
-            text_color=colors["primary"]
-        ).pack(side="left")
-        # Right: Exit Button
-        exit_btn = ctk.CTkButton(
-            header_content, 
-            text="✕ Exit",
-            width=100, 
-            height=35,
-            font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color=colors["error"],
-            hover_color=colors["error_hover"],
-            command=self.destroy
-        )
-        exit_btn.pack(side="right")
-        
-        # --- CONTENT CONTAINER ---
-        self.container = ctk.CTkFrame(
-            main_container, 
-            fg_color=colors["background"]
-        )
-        self.container.pack(fill="both", expand=True)
-        self.current_screen = None
-        
-        # Show initial screen
-        self.show_screen(DoctorLoginScreen)
-    
-    def show_screen(self, screen_class, **kwargs):
-        """
-        Switches the current screen to the desired class.
-        Args:
-            screen_class: The screen class to display
-            **kwargs: Additional arguments to pass to the screen
-        """
-        if self.current_screen:
-            self.current_screen.destroy()
-        self.current_screen = screen_class(self.container, self, **kwargs)
-        self.current_screen.pack(fill="both", expand=True)
+def valid_role(r: str) -> bool:
+    return r in ("doctor", "patient")
 
+@app.on_event("startup")
+def on_startup():
+    models.create_db_and_tables()
+
+
+@app.get("/")
+def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/register/{role}")
+def register_get(request: Request, role: str):
+    if not valid_role(role):
+        return RedirectResponse("/", status_code=303)
+    return templates.TemplateResponse("register.html", {"request": request, "role": role})
+
+@app.post("/register/{role}")
+async def register_post(
+    request: Request,
+    role: str,
+    session: SessionDep,
+    username: str = Form(...),
+    password: str = Form(...),
+    license: str = Form(None),
+    phone: str = Form(None),
+    specialization: str = Form(None),
+    fullname: str = Form(None),
+    dob: str = Form(None),
+):
+    if not valid_role(role):
+        return RedirectResponse("/", status_code=303)
+
+    # ---- Phone validation ----
+    if not phone or not phone.isdigit() or len(phone) != 10:
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "role": role, "error": "Phone number must be exactly 10 digits"},
+        )
+
+    # ---- Username exists? ----
+    if role == "doctor":
+        existing_user = session.exec(
+            select(models.Doctor).where(models.Doctor.username == username)
+        ).first()
+    else:
+        existing_user = session.exec(
+            select(models.Patient).where(models.Patient.username == username)
+        ).first()
+
+    if existing_user:
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "role": role, "error": "Username already exists"},
+        )
+
+    # ---- Create new user ----
+    if role == "doctor":
+        new_user = models.Doctor(
+            username=username,
+            password=password,
+            license=license,
+            specialization=specialization,
+            phone=phone,
+        )
+    else:
+        new_user = models.Patient(
+            username=username,
+            password=password,
+            fullname=fullname,
+            dob=dob,
+            phone=phone,
+        )
+
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+
+    return RedirectResponse(f"/login/{role}?registered=1", status_code=303)
+
+@app.get("/login/{role}")
+def login_get(request: Request, role: str):
+    if not valid_role(role):
+        return RedirectResponse("/", status_code=303)
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request, "role": role, "registered": request.query_params.get("registered")},
+    )
+
+
+@app.post("/login/{role}")
+async def login_post(
+    request: Request,
+    role: str,
+    session: SessionDep,
+    username: str = Form(...),
+    password: str = Form(...),
+):
+    if not valid_role(role):
+        return RedirectResponse("/", status_code=303)
+
+    # ----- LOGIN USING DATABASE -----
+    if role == "doctor":
+        user = session.exec(select(models.Doctor).where(models.Doctor.username == username)).first()
+    else:
+        user = session.exec(select(models.Patient).where(models.Patient.username == username)).first()
+
+    if not user or user.password != password:
+        return templates.TemplateResponse(
+            "login.html",
+            {"request": request, "role": role, "error": "Invalid credentials"},
+        )
+    return RedirectResponse(f"/session?role={role}&user={username}", status_code=303)
+
+
+@app.get("/session")
+def session_page(request: Request, role: str = "", user: str = ""):
+    if not valid_role(role) or not user:
+        return RedirectResponse("/", status_code=303)
+    return templates.TemplateResponse(
+        "session.html", {"request": request, "role": role, "user": user}
+    )
+
+@app.post("/start-stream")
+def start_stream():
+    """
+    Trigger the publisher script to send demo ECG data.
+    """
+    script_path = Path(__file__).parent / "publisher.py"
+    if not script_path.exists():
+        return {"error": "publisher.py not found"}
+    # Trigger MQTT publisher non-blocking
+    subprocess.Popen([sys.executable, str(script_path)])
+    return RedirectResponse("/session?role=patient&user=test", status_code=303)
 
 if __name__ == "__main__":
-    app = MedicalMonitorApp()
-    app.mainloop()
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

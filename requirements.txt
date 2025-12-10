@@ -13,3 +13,4 @@ python-dotenv
 loguru
 getmac
 fastapi[standard]
+sqlmodel

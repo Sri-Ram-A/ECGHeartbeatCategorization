@@ -15,3 +15,7 @@
 # CustomTkinter
 - First code generated from GPT
 - https://www.geeksforgeeks.org/python/tkinter-application-to-switch-between-different-page-frames/
+
+# Shifting to fast-api
+- https://fastapi.tiangolo.com/advanced/templates/#using-jinja2templates
+- https://fastapi.tiangolo.com/tutorial/sql-databases/
