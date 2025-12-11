@@ -24,7 +24,6 @@ export default function Home() {
             Welcome
           </h1>
         </div>
-        
       </section>
 
       <section className="h-screen w-full bg-yellow-400 flex items-center justify-center">

@@ -65,10 +65,10 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
 
     return (
         // Apply the imported font to the root element
-        <div className={`min-h-screen flex ${inter.className}`}>
+        <div className={`min-h-screen bg-black flex ${inter.className}`}>
 
             {/* Left Section: Image and Text */}
-            <section className="hidden lg:flex lg:w-1/2 relative bg-[#091020] items-end p-24">
+            <section className="hidden lg:flex lg:w-1/2 relative bg-black items-end p-8">
                 {/* Left Video */}
                 <video muted loop autoPlay playsInline className="absolute inset-0 h-full w-full object-cover">
                     <source src="/jellyfish.mp4" type="video/mp4" />
@@ -84,10 +84,10 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
             </section>
 
             {/* Right Section: Form */}
-            <section className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-black relative">
+            <section className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-gradient-to-bl from-purple-400 via-blue-900 to-black relative rounded-l-4xl">
 
                 {/* Form Container */}
-                <div className="w-full max-w-md relative z-10 p-8 space-y-8">
+                <div className="w-full max-w-md relative z-10 p-6 space-y-6">
 
                     {/* Header */}
                     <div className="space-y-2">
@@ -100,7 +100,7 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-3">
                         {/* Full Name */}
                         <div className="space-y-2">
                             <label htmlFor="full_name" className="block text-sm font-medium text-white/90">Full Name</label>

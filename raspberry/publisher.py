@@ -16,7 +16,6 @@ from loguru import logger
 BASE_DIR = Path().resolve().parent
 logger.success(f"Loaded env from : {BASE_DIR}")
 load_dotenv(dotenv_path=str(BASE_DIR / ".env"))
-
 MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 8883))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME")
