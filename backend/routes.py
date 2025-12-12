@@ -96,3 +96,4 @@ async def login_post(role: str, session: SessionDep, payload: dict = Body(...)):
         "user_id": user.id,
         "full_name": user.full_name,
     }
+
