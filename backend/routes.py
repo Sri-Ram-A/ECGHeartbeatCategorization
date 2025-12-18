@@ -45,7 +45,7 @@ def register(role: str, session: SessionDep, payload: dict = Body(...)):
         doctor = models.Doctor(
             full_name=data.full_name,
             phone_number=data.phone_number,
-            license_number=payload.get("licenseNumber"),
+            license_number=payload.get("license_number"),
             specialization=payload.get("specialization"),
             password=hash_password(data.password)
         )
