@@ -28,6 +28,7 @@ class RecordingSession(SQLModel, table=True):
     patient_id: int
     started_at: datetime = Field(default_factory=datetime.now)
     stopped_at: Optional[datetime] = None
+    verdict:str
 
 class Device(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

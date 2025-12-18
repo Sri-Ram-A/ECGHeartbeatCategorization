@@ -6,7 +6,7 @@ type HttpMethod = "GET" | "POST";
 export default async function makeRequest<T = any>(method: HttpMethod, query: string, role?: string, payload?: object): Promise<T> {
     const url = role
         ? `${BACKEND_URL}/api/${query}/${role}`
-        : `${BACKEND_URL}/api/${query}`;
+        : `${BACKEND_URL}/api/${query}/`;
     const options: RequestInit = {
         method,
         headers: { "Content-Type": "application/json", },
@@ -18,9 +18,19 @@ export default async function makeRequest<T = any>(method: HttpMethod, query: st
     const res = await fetch(url, options);
     let data: any = null;
 
+    // Log the response for debugging
+    console.log('Response status:', res.status);
+    console.log('Response headers:', res.headers);
+
+    // Get the raw text first
+    const text = await res.text();
+    console.log('Raw response:', text);
+
     try {
-        data = await res.json();
-    } catch {
+        data = JSON.parse(text);
+    } catch (e) {
+        console.error('JSON parse error:', e);
+        console.error('Response text:', text);
         toast.error(`Invalid JSON response (${res.status})`);
         throw new Error("Invalid JSON response from server");
     }
@@ -42,7 +52,7 @@ export async function postMqttRequest<T = any>(
     const url = `${BACKEND_URL}/mqtt/${query}`;
     const options: RequestInit = {
         method: "POST",
-        headers: {"Content-Type": "application/json",},
+        headers: { "Content-Type": "application/json", },
     };
     if (payload) {
         options.body = JSON.stringify(payload);

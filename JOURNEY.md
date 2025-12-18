@@ -27,5 +27,10 @@
 - Install using pip : https://github.com/NVIDIA/TensorRT
 
 # Deployment Desicions :
-- Setting up ngrok for backend : https://dashboard.ngrok.com/get-started/setup/linux
+- Setting up ngrok for backend : 
+https://dashboard.ngrok.com/get-started/setup/linux
+```bash
+ngrok http --url=cub-true-shiner.ngrok-free.app http://127.0.0.1:8000/
+```
 - Hosting frontend to vercel : https://vercel.com/new/sriramaai23-rvceeduins-projects
+- Frontend link : https://ecg-heartbeat-categorization.vercel.app

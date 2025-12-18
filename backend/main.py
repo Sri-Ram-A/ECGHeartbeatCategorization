@@ -31,7 +31,7 @@ fast_mqtt = FastMQTT(config=mqtt_config)
 app = FastAPI(title="ECG Backend with MQTT")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000","https://ecg-heartbeat-categorization.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
