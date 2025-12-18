@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { Inter } from "next/font/google";
-import { BACKEND_URL } from "@/services/api";
+import makeRequest from "@/services/request";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,24 +42,7 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
             payload.dob = form.dob;
         }
         console.log("Role:", normalizedRole);
-        console.log("Submitted data:", payload);
-        try {
-            const res = await fetch(`${BACKEND_URL}/register/${normalizedRole}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-            const data = await res.json();
-            console.log("Server response:", data);
-            if (!res.ok) {
-                alert("Registration failed: " + (data.detail || "Unknown error"));
-                return;
-            }
-            alert("Registration successful!");
-        } catch (err) {
-            console.error("Fetch error:", err);
-            alert("Network error");
-        }
+        const data = await makeRequest("POST", "register", normalizedRole, payload)
     };
 
     return (
@@ -172,7 +154,7 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
                                 type="password"
                                 value={form.password}
                                 onChange={(e) => update("password", e.target.value)}
-                                placeholder="Create a secure password"
+                                placeholder="Create a secure password (min 8 characters)"
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
                             />

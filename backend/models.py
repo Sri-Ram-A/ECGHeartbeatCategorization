@@ -29,9 +29,11 @@ class RecordingSession(SQLModel, table=True):
     started_at: datetime = Field(default_factory=datetime.now)
     stopped_at: Optional[datetime] = None
 
-class RaspberryPI(SQLModel,table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    mac_addr:str
+class Device(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    device_id: str = Field(index=True, unique=True)
+    registered_at: datetime = Field(default_factory=datetime.now)
+    last_seen: Optional[datetime] = None
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)

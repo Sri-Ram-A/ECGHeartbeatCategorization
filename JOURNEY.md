@@ -22,3 +22,6 @@
 # Shifted to rest api with fast-api instead of jinja
 - https://www.geeksforgeeks.org/python/creating-first-rest-api-with-fastapi/
 - https://fastapi.tiangolo.com/tutorial/sql-databases/
+
+# Trying TensorRT
+- Install using pip : https://github.com/NVIDIA/TensorRT

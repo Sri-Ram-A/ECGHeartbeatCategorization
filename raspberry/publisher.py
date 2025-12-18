@@ -10,9 +10,7 @@ import os
 import time
 from loguru import logger
 
-# -------------------------
 # Load .env configuration
-# -------------------------
 BASE_DIR = Path().resolve().parent
 load_dotenv(dotenv_path=str(BASE_DIR / ".env"))
 logger.success(f"Loaded env from : {BASE_DIR / ".env"}")
@@ -20,20 +18,23 @@ MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 8883))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
-PATIENT_ID = "P-123"
 KEEP_ALIVE = 60
 
 streaming = False   # flag controlled by MQTT commands
+PATIENT_ID = "4"
+DOCTOR_ID = "9"
 
+DEVICE = f"{socket.gethostname()}_{get_mac_address()}"
+TOPIC = f"stream/{DOCTOR_ID}/{PATIENT_ID}"
+COMMAND_TOPIC = f"commands/{DOCTOR_ID}/{PATIENT_ID}"
 # MQTT Callback Handlers
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
         logger.success("Connected to MQTT broker successfully")
-        client.subscribe(f"commands/{PATIENT_ID}")
-        logger.info(f"Subscribed to: commands/{PATIENT_ID}")
+        client.subscribe(COMMAND_TOPIC)
+        logger.info(f"Subscribed to: {COMMAND_TOPIC}")
     else:
         logger.error(f"Failed to connect. RC={rc}")
-
 
 def on_message(client, userdata, msg):
     global streaming
@@ -46,7 +47,6 @@ def on_message(client, userdata, msg):
         streaming = False
         logger.warning("Streaming disabled by Jetson")
 
-# Dummy sensor function
 # Replace with actual ECG read
 def read_ecg():
     # right now send dummy. Replace with real sensor value
@@ -71,13 +71,11 @@ try:
     while True:
         if streaming:
             payload = {
-                "sender": f"{socket.gethostname()}_{get_mac_address()}",
                 "timestamp": str(datetime.now()),
                 "values": read_ecg()
             }
-            topic = f"ecg/{PATIENT_ID}/stream"
-            client.publish(topic, json.dumps(payload))
-            logger.info(f"ECG sent → {topic}")
+            client.publish(TOPIC, json.dumps(payload))
+            logger.info(f"ECG sent → {TOPIC} → {payload}")
         time.sleep(0.25)  # Adjust streaming rate
         
 except KeyboardInterrupt:

@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 from typing import Annotated
 import models, schemas
 from security import hash_password, verify_password
-
+from datetime import datetime
 router = APIRouter(prefix="/api", tags=["HTTP API"])
 
 SessionDep = Annotated[Session, Depends(models.get_session)]
@@ -12,7 +12,7 @@ def valid_role(role):
     return role in ("doctor", "patient")
 
 @router.post("/register/{role}")
-def register_post(role: str, session: SessionDep, payload: dict = Body(...)):
+def register(role: str, session: SessionDep, payload: dict = Body(...)):
     if not valid_role(role):
         raise HTTPException(status_code=400, detail="Invalid role")
 
@@ -68,7 +68,7 @@ def register_post(role: str, session: SessionDep, payload: dict = Body(...)):
     return {"status": "success", "patient_id": patient.id}
 
 @router.post("/login/{role}")
-async def login_post(role: str, session: SessionDep, payload: dict = Body(...)):
+async def login(role: str, session: SessionDep, payload: dict = Body(...)):
     if not valid_role(role):
         raise HTTPException(status_code=400, detail="Invalid role")
 
@@ -97,3 +97,8 @@ async def login_post(role: str, session: SessionDep, payload: dict = Body(...)):
         "full_name": user.full_name,
     }
 
+@router.get("/patients")
+def get_patients(session: Session = Depends(models.get_session)):
+    """Get all patients"""
+    patients = session.exec(select(models.Patient)).all()
+    return {"patients": patients}

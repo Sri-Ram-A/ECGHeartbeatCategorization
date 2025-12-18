@@ -2,11 +2,14 @@
 import React, { useState } from "react";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
-import { BACKEND_URL } from "@/services/api";
+import { setSession } from '@/lib/session';
+import { useRouter } from 'next/navigation';
+import makeRequest from "@/services/request";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function LoginPage({ params }: { params: Promise<{ role: string }> }) {
+  const router = useRouter();
   const { role } = React.use(params);
   const normalizedRole = role.toLowerCase();
 
@@ -30,23 +33,15 @@ export default function LoginPage({ params }: { params: Promise<{ role: string }
       password: form.password.trim(),
     };
     console.log("Role:", normalizedRole);
-    console.log("Login data:", payload);
-    try {
-      const res = await fetch(`${BACKEND_URL}/login/${normalizedRole}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+    const data = await makeRequest("POST", "login", normalizedRole, payload);
+    if (normalizedRole === 'doctor') {
+      // Store session data
+      setSession({
+        user_id: data.user_id,
+        full_name: data.full_name
       });
-      const data = await res.json();
-      console.log("Server response:", data);
-      if (!res.ok) {
-        alert("Login failed: " + (data.detail || "Unknown error"));
-        return;
-      }
-      alert("Login successful!");
-    } catch (err) {
-      console.error("Fetch error:", err);
-      alert("Network error");
+      // Redirect doctors to dashboard
+      router.push('/dashboard');
     }
   };
 
@@ -142,6 +137,7 @@ export default function LoginPage({ params }: { params: Promise<{ role: string }
           </p>
         </div>
       </section>
+
     </div>
   );
 }
