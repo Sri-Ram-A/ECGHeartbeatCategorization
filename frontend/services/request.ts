@@ -3,34 +3,34 @@ import { toast } from "react-toastify";
 
 type HttpMethod = "GET" | "POST";
 
-export default async function makeRequest<T = any>(method: HttpMethod, query: string, role?: string, payload?: object): Promise<T> {
+export default async function makeRequest<T = any>(
+    method: HttpMethod,
+    query: string,
+    role?: string,
+    payload?: object
+): Promise<T> {
     const url = role
         ? `${BACKEND_URL}/api/${query}/${role}`
-        : `${BACKEND_URL}/api/${query}/`;
+        : `${BACKEND_URL}/api/${query}`;
+
     const options: RequestInit = {
         method,
-        headers: { "Content-Type": "application/json", },
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "69420",  // Add this! Any value works
+        },
     };
-    // Only attach body for POST
+
     if (method === "POST" && payload) {
         options.body = JSON.stringify(payload);
     }
+
     const res = await fetch(url, options);
     let data: any = null;
 
-    // Log the response for debugging
-    console.log('Response status:', res.status);
-    console.log('Response headers:', res.headers);
-
-    // Get the raw text first
-    const text = await res.text();
-    console.log('Raw response:', text);
-
     try {
-        data = JSON.parse(text);
-    } catch (e) {
-        console.error('JSON parse error:', e);
-        console.error('Response text:', text);
+        data = await res.json();
+    } catch {
         toast.error(`Invalid JSON response (${res.status})`);
         throw new Error("Invalid JSON response from server");
     }
@@ -42,6 +42,7 @@ export default async function makeRequest<T = any>(method: HttpMethod, query: st
     } else {
         toast.success(data?.detail || data?.message || "Request successful");
     }
+
     return data;
 }
 
@@ -50,21 +51,29 @@ export async function postMqttRequest<T = any>(
     payload?: object
 ): Promise<T> {
     const url = `${BACKEND_URL}/mqtt/${query}`;
+
     const options: RequestInit = {
         method: "POST",
-        headers: { "Content-Type": "application/json", },
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "69420",  // Add this here too!
+        },
     };
+
     if (payload) {
         options.body = JSON.stringify(payload);
     }
+
     const res = await fetch(url, options);
     let data: any = null;
+
     try {
         data = await res.json();
     } catch {
         toast.error(`Invalid JSON response (${res.status})`);
         throw new Error("Invalid JSON response from MQTT server");
     }
+
     if (!res.ok) {
         const message =
             data?.detail ||
@@ -73,5 +82,6 @@ export async function postMqttRequest<T = any>(
         toast.error(message);
         throw new Error(message);
     }
+
     return data;
 }
