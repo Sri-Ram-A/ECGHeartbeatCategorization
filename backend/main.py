@@ -3,19 +3,18 @@ import json
 from pathlib import Path
 from loguru import logger
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from fastapi import HTTPException
 from datetime import datetime
+from fastapi import FastAPI,HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_mqtt import FastMQTT, MQTTConfig
 from routes import router as http_router,SessionDep
-from models import RecordingSession
-from fastapi import HTTPException, Depends
 from sqlmodel import Session, select
 from typing import Annotated
+from models import RecordingSession
 import models
-SessionDep = Annotated[Session, Depends(models.get_session)]
+
 # Configuration & Setup
+SessionDep = Annotated[Session, Depends(models.get_session)]
 BASE_DIR = Path(__file__).parent
 load_dotenv(dotenv_path=str(BASE_DIR / ".env"))
 MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
@@ -31,7 +30,10 @@ fast_mqtt = FastMQTT(config=mqtt_config)
 app = FastAPI(title="ECG Backend with MQTT")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","https://ecg-heartbeat-categorization.vercel.app"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://ecg-heartbeat-categorization.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,7 +48,6 @@ def startup():
     models.create_db_and_tables()
     logger.success("Database initialized")
 
-# MQTT Event Handlers
 @fast_mqtt.on_connect()
 def on_connect(client, flags, rc, properties):
     # Confirms the TCP + MQTT handshake
@@ -61,7 +62,6 @@ def on_subscribe_ack(client, mid, qos, properties):
     # Fires when the broker confirms a subscription
     logger.info(f"Subscription acknowledged (mid={mid}, qos={qos})")
 
-# ECG Data Handler
 @fast_mqtt.subscribe("stream/+/+")
 async def handle_ecg_stream(client, topic, payload, qos, properties):
     """Process incoming ECG data from Raspberry Pi"""
@@ -71,8 +71,7 @@ async def handle_ecg_stream(client, topic, payload, qos, properties):
         stream_name,device,patient_id = parts
         # Parse payload
         data = json.loads(payload.decode())
-        timestamp = data.get('timestamp')
-        values = data.get('values')
+        timestamp,values = data.get('timestamp'),data.get('values')
         logger.info(f"{timestamp:>20} | {device:>10} | Values: {str(values):>30}")
     except Exception as e:
         logger.error(f"Error processing ECG stream: {e}")
@@ -83,12 +82,10 @@ async def handle_ecg_stream(client, topic, payload, qos, properties):
         # - Detect anomalies
         # - Broadcast to frontend via WebSocket
 
-# HTTP Endpoints for MQTT Control
 @app.post("/mqtt/start/{doctor_id}/{patient_id}")
 async def start_streaming(doctor_id: int,patient_id: int,session: SessionDep):
     topic = f"commands/{doctor_id}/{patient_id}"
-
-    # --- 2. Prevent duplicate active sessions ---
+    # --- Prevent duplicate active sessions ---
     active_stmt = select(RecordingSession).where(
        RecordingSession.doctor_id == doctor_id,
        RecordingSession.patient_id == patient_id,
@@ -97,22 +94,16 @@ async def start_streaming(doctor_id: int,patient_id: int,session: SessionDep):
     active = session.exec(active_stmt).first()
     if active:
         raise HTTPException(400, "Recording session already running")
-
-    # --- 3. Create recording session ---
+    # --- Create recording session ---
     recording = RecordingSession(doctor_id=doctor_id,patient_id=patient_id,verdict="pending")
     session.add(recording)
     session.commit()
     session.refresh(recording)
 
-    # --- 4. Send MQTT START ---
+    # --- Send MQTT START ---
     fast_mqtt.publish(topic, "start")
     logger.info(f"Sent START command to {topic}")
-
-    return {
-        "status": "success",
-        "session_id": recording.id,
-        "message": "Streaming started"
-    }
+    return {"status": "success","session_id": recording.id,"message": "started"}
 
 @app.post("/mqtt/stop/{doctor_id}/{patient_id}")
 async def stop_streaming(doctor_id: int,patient_id: int,session: SessionDep):
@@ -127,16 +118,12 @@ async def stop_streaming(doctor_id: int,patient_id: int,session: SessionDep):
     recording.stopped_at = datetime.now()
     session.add(recording)
     session.commit()
-
+    
+    # --- Send MQTT STOP ---
     topic = f"commands/{doctor_id}/{patient_id}"
     fast_mqtt.publish(topic, "stop")
     logger.warning(f"Sent STOP command to {topic}")
-    return {
-        "status": "success",
-        "session_id": recording.id,
-        "message": "Streaming stopped"
-    }
-
+    return {"status": "success","session_id": recording.id,"message": "stopped"}
 
 @app.get("/")
 async def root():

@@ -21,8 +21,8 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
 KEEP_ALIVE = 60
 
 streaming = False   # flag controlled by MQTT commands
-PATIENT_ID = "4"
-DOCTOR_ID = "9"
+PATIENT_ID = "1"
+DOCTOR_ID = "1"
 
 DEVICE = f"{socket.gethostname()}_{get_mac_address()}"
 TOPIC = f"stream/{DOCTOR_ID}/{PATIENT_ID}"

@@ -102,3 +102,9 @@ def get_patients(session: Session = Depends(models.get_session)):
     """Get all patients"""
     patients = session.exec(select(models.Patient)).all()
     return {"patients": patients}
+
+@router.get("/doctors")
+def get_patients(session: Session = Depends(models.get_session)):
+    """Get all doctors"""
+    doctors = session.exec(select(models.Doctor)).all()
+    return {"doctors": doctors}
