@@ -37,7 +37,7 @@ export default function LoginPage({ params }: { params: Promise<{ role: string }
     if (normalizedRole === 'doctor') {
       // Store session data
       setSession({
-        user_id: data.user_id,
+        id: data.id,
         full_name: data.full_name
       });
       // Redirect doctors to dashboard

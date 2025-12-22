@@ -10,8 +10,8 @@ export default async function makeRequest<T = any>(
     payload?: object
 ): Promise<T> {
     const url = role
-        ? `${BACKEND_URL}/api/${query}/${role}`
-        : `${BACKEND_URL}/api/${query}`;
+        ? `${BACKEND_URL}/api/${query}/${role}/`
+        : `${BACKEND_URL}/api/${query}/`;
 
     const options: RequestInit = {
         method,
@@ -50,7 +50,7 @@ export async function postMqttRequest<T = any>(
     query: string,
     payload?: object
 ): Promise<T> {
-    const url = `${BACKEND_URL}/mqtt/${query}`;
+    const url = `${BACKEND_URL}/api/mqtt/${query}/`;
 
     const options: RequestInit = {
         method: "POST",

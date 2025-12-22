@@ -22,18 +22,18 @@ jupyter notebook
 
 // 4. Find your Jetpack version 
 dpkg-query --show nvidia-l4t-core
-// Mine is Mine is 4.6.1-b110
+// Mine is Mine is 4.6.5
 ``` 
 
 ## 5 . Find your tensorflow version at : 
 - https://developer.download.nvidia.com/compute/redist/jp/
 - Now follow the below documentation 
 - https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform/index.html
+
 ```bash
 sudo apt-get update
 sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
 source venv38/bin/activate
-pip3 install -U testresources setuptools==65.5.0
-pip3 install -U numpy==1.22 future==0.18.2 mock==3.0.5 keras_preprocessing==1.1.2 keras_applications==1.0.8 gast==0.4.0 protobuf pybind11 cython pkgconfig packaging h5py==3.7.0
-pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow-gpu==2.6.2+nv21.12
+pip3 install -U testresources setuptools numpy future mock keras_preprocessing keras_applications gast protobuf pybind11 cython pkgconfig packaging h5py
+pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v46 tensorflow==2.6.2+nv21.12
 ```

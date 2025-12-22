@@ -27,9 +27,10 @@ export default function DashboardPage() {
     useEffect(() => {
         (async () => {
             const session = getSession();
+            console.log("Session:", session);
             if (!session) return router.push("/login/doctor");
             setDoctorName(session.full_name);
-            setDoctorID(session.user_id);
+            setDoctorID(session.id);
             const res = await makeRequest("GET", "patients");
             setPatients(res.patients ?? []);
             setLoading(false);
@@ -43,7 +44,7 @@ export default function DashboardPage() {
         }
         const session = getSession();
         if (!session) return router.push("/login/doctor");
-        await postMqttRequest(`start/${session.user_id}/${selectedPatientId}`)
+        await postMqttRequest(`start/${session.id}/${selectedPatientId}`)
         toast.success("Started Streaming");
         console.log("Streaming started");
     };
@@ -54,7 +55,7 @@ export default function DashboardPage() {
         }
         const session = getSession();
         if (!session) return router.push("/login/doctor");
-        await postMqttRequest(`stop/${session.user_id}/${selectedPatientId}`);
+        await postMqttRequest(`stop/${session.id}/${selectedPatientId}`);
         console.log("Streaming stopped");
         toast.success("Successfully finished streaming");
 
