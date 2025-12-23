@@ -1,18 +1,7 @@
 from django.urls import path
-from .views_authenticate import (
-    DoctorRegisterView,
-    PatientRegisterView,
-    DoctorLoginView,
-    PatientLoginView
-)
-from .views_general import (
-    PatientListView,
-    DoctorListView,
-)
-from .views_mqtt import (
-    StartStreamingView,
-    StopStreamingView
-)
+from ecg.views.authenticate import (DoctorRegisterView,PatientRegisterView,DoctorLoginView,PatientLoginView)
+from ecg.views.general import (PatientListView,DoctorListView)
+from ecg.views.mqtt import (StartStreamingView,StopStreamingView)
 
 urlpatterns = [
     # Authentication

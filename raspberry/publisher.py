@@ -15,46 +15,40 @@ import numpy as np
 BASE_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BASE_DIR / ".env")
 
+# Connect to Broker
 MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 8883))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
 
+# Global vars
 DATASET_PATH = BASE_DIR / "data" /"1"/ "mitbih_test.csv"
-PATIENT_ID = "1"
-DOCTOR_ID = "1"
-# DEVICE_ID = f"{socket.gethostname()}_{get_mac_address()}"
-DEVICE_ID = f"{socket.gethostname()}"
-
+PATIENT_ID = "2"
+DOCTOR_ID = "2"
+DEVICE_ID = f"{socket.gethostname()}_{get_mac_address()}"
+DEVICE_REGISTER_TOPIC = "devices/register"
+STREAM_TOPIC = f"stream/{DOCTOR_ID}/{PATIENT_ID}"
+COMMANDS_TOPIC = f"commands/{DOCTOR_ID}/{PATIENT_ID}"
 # Global state
 streaming = False
-
 
 def load_ecg_data():
     """Load ECG dataset from CSV"""
     if not DATASET_PATH.exists():
         raise FileNotFoundError(f"Dataset not found: {DATASET_PATH}")
-    
-    data = np.genfromtxt(
-        str(DATASET_PATH),
-        delimiter=',',
-        skip_header=1,
-        max_rows=100
-    )
+    data = np.genfromtxt(str(DATASET_PATH),delimiter=',',skip_header=1,max_rows=100)
     data = data[:, :-1]  # Remove last column (label)
     logger.info(f"Loaded {data.shape[0]} ECG signals with {data.shape[1]} values each")
     return data
 
-
-def on_connect(client, userdata, flags, rc, properties=None):
+def on_connect(client, userdata, flags, rc,properties=None):
     """Callback when connected to MQTT broker"""
     if rc == 0:
         logger.success("Connected to MQTT broker")
-        client.subscribe(f"commands/{DOCTOR_ID}/{PATIENT_ID}")
-        logger.info(f"Subscribed to commands/{DOCTOR_ID}/{PATIENT_ID}")
+        client.subscribe(COMMANDS_TOPIC)
+        logger.info(f"Subscribed to {COMMANDS_TOPIC}")
     else:
         logger.error(f"Connection failed. Error code: {rc}")
-
 
 def on_message(client, userdata, msg):
     """Callback when receiving MQTT messages"""
@@ -69,16 +63,10 @@ def on_message(client, userdata, msg):
     else:
         logger.warning(f"Unknown command: {command}")
 
-
 def register_device(client):
     """Register this device with the broker"""
-    payload = {
-        "device_id": DEVICE_ID,
-        "hostname": socket.gethostname(),
-        "mac": get_mac_address(),
-        "timestamp": datetime.now().isoformat()
-    }
-    client.publish("devices/register", json.dumps(payload))
+    payload = {"device_id": DEVICE_ID}
+    client.publish(DEVICE_REGISTER_TOPIC, json.dumps(payload))
     logger.info(f"Device registered: {DEVICE_ID}")
 
 
@@ -86,13 +74,11 @@ def publish_ecg_data(client, ecg_values):
     """Publish ECG data to MQTT topic"""
     payload = {
         "timestamp": datetime.now().isoformat(),
-        "device_id": DEVICE_ID,
-        "values": ecg_values
+        "values": ecg_values,
+        "device_id":DEVICE_ID
     }
-    topic = f"stream/{DOCTOR_ID}/{PATIENT_ID}"
-    client.publish(topic, json.dumps(payload))
-    logger.debug(f"Published {len(ecg_values)} values to {topic}")
-
+    client.publish(STREAM_TOPIC, json.dumps(payload))
+    logger.debug(f"Published {len(ecg_values)} values to {STREAM_TOPIC}")
 
 def main():
     """Main streaming loop"""
@@ -100,7 +86,7 @@ def main():
     
     # Load data
     ecg_data = load_ecg_data()
-    
+    len_ecg_data = len(ecg_data)
     # Setup MQTT client
     client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2)
     client.tls_set()
@@ -121,7 +107,7 @@ def main():
         row_index = 0
         while True:
             if streaming:
-                if row_index >= len(ecg_data):
+                if row_index >= len_ecg_data:
                     logger.warning("Dataset exhausted. Restarting from beginning...")
                     row_index = 0
                 

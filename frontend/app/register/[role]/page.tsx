@@ -42,7 +42,12 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
             payload.dob = form.dob;
         }
         console.log("Role:", normalizedRole);
-        const data = await makeRequest("POST", "register", normalizedRole, payload)
+        const data = await makeRequest({
+            method: "POST",
+            path: `register/${normalizedRole}`,
+            payload,
+        });
+
     };
 
     return (

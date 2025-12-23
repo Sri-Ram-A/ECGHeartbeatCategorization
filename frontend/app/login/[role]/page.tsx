@@ -33,7 +33,12 @@ export default function LoginPage({ params }: { params: Promise<{ role: string }
       password: form.password.trim(),
     };
     console.log("Role:", normalizedRole);
-    const data = await makeRequest("POST", "login", normalizedRole, payload);
+    const data = await makeRequest({
+      method: "POST",
+      path: `login/${normalizedRole}`,
+      payload,
+    });
+
     if (normalizedRole === 'doctor') {
       // Store session data
       setSession({

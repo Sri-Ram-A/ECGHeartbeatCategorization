@@ -24,3 +24,5 @@ devices/register - Device registration
 Published Topics
 commands/<doctor_id>/<patient_id> - Start/stop commands
 ```
+# How paho-mqtt works
+- https://www.emqx.com/en/blog/how-to-use-mqtt-in-python

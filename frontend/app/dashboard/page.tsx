@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getSession } from "@/lib/session";
-import makeRequest, { postMqttRequest } from "@/services/request";
+import makeRequest from "@/services/request";
 import { toast } from "react-toastify";
 import { Spotlight } from "@/components/ui/spotlight";
 import Image from "next/image";
@@ -31,7 +31,10 @@ export default function DashboardPage() {
             if (!session) return router.push("/login/doctor");
             setDoctorName(session.full_name);
             setDoctorID(session.id);
-            const res = await makeRequest("GET", "patients");
+            const res = await makeRequest({
+                method: "GET",
+                path: "patients"
+            });
             setPatients(res.patients ?? []);
             setLoading(false);
         })();
@@ -44,7 +47,10 @@ export default function DashboardPage() {
         }
         const session = getSession();
         if (!session) return router.push("/login/doctor");
-        await postMqttRequest(`start/${session.id}/${selectedPatientId}`)
+        await makeRequest({
+            method: "POST",
+            path:`mqtt/start/${session.id}/${selectedPatientId}`
+        });
         toast.success("Started Streaming");
         console.log("Streaming started");
     };
@@ -55,7 +61,10 @@ export default function DashboardPage() {
         }
         const session = getSession();
         if (!session) return router.push("/login/doctor");
-        await postMqttRequest(`stop/${session.id}/${selectedPatientId}`);
+        await makeRequest({
+            "method": "POST",
+            "path":`mqtt/stop/${session.id}/${selectedPatientId}`
+        });
         console.log("Streaming stopped");
         toast.success("Successfully finished streaming");
 

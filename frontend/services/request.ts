@@ -3,85 +3,58 @@ import { toast } from "react-toastify";
 
 type HttpMethod = "GET" | "POST";
 
-export default async function makeRequest<T = any>(
-    method: HttpMethod,
-    query: string,
-    role?: string,
-    payload?: object
-): Promise<T> {
-    const url = role
-        ? `${BACKEND_URL}/api/${query}/${role}/`
-        : `${BACKEND_URL}/api/${query}/`;
-
-    const options: RequestInit = {
-        method,
-        headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "69420",  // Add this! Any value works
-        },
-    };
-
-    if (method === "POST" && payload) {
-        options.body = JSON.stringify(payload);
-    }
-
-    const res = await fetch(url, options);
-    let data: any = null;
-
-    try {
-        data = await res.json();
-    } catch {
-        toast.error(`Invalid JSON response (${res.status})`);
-        throw new Error("Invalid JSON response from server");
-    }
-
-    if (!res.ok) {
-        const message = data?.detail || data?.message || `Request failed (${res.status})`;
-        toast.error(message);
-        throw new Error(message);
-    } else {
-        toast.success(data?.detail || data?.message || "Request successful");
-    }
-
-    return data;
+interface MakeRequestOptions {
+  method?: HttpMethod;
+  path: string;          // e.g. "register/doctor" OR "mqtt/start/1/2"
+  payload?: object;
 }
 
-export async function postMqttRequest<T = any>(
-    query: string,
-    payload?: object
-): Promise<T> {
-    const url = `${BACKEND_URL}/api/mqtt/${query}/`;
+export default async function makeRequest<T = any>({
+  method = "GET",
+  path,
+  payload,
+}: MakeRequestOptions): Promise<T> {
 
-    const options: RequestInit = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "69420",  // Add this here too!
-        },
-    };
+  // ---- Normalize URL (no double slashes) ----
+  const base = BACKEND_URL.replace(/\/+$/, "");
+  const cleanPath = path.replace(/^\/+/, "");
+  const url = `${base}/api/${cleanPath}/`;
+  // ---- Headers ----
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+  // Add ngrok header ONLY when needed
+  if (base.includes("ngrok")) {
+    headers["ngrok-skip-browser-warning"] = "69420";
+  }
+  const options: RequestInit = {
+    method,
+    headers,
+  };
+  if (method === "POST" && payload) {
+    options.body = JSON.stringify(payload);
+  }
+  // ---- Fetch ----
+  const res = await fetch(url, options);
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {
+    toast.error(`Invalid JSON response (${res.status})`);
+    throw new Error("Invalid JSON response from server");
+  }
+  // ---- Error handling ----
+  if (!res.ok) {
+    const message =
+      data?.detail ||
+      data?.error ||
+      data?.message ||
+      `Request failed (${res.status})`;
 
-    if (payload) {
-        options.body = JSON.stringify(payload);
-    }
-
-    const res = await fetch(url, options);
-    let data: any = null;
-
-    try {
-        data = await res.json();
-    } catch {
-        toast.error(`Invalid JSON response (${res.status})`);
-        throw new Error("Invalid JSON response from MQTT server");
-    }
-
-    if (!res.ok) {
-        const message =
-            data?.detail ||
-            data?.message ||
-            `MQTT request failed (${res.status})`;
-        toast.error(message);
-        throw new Error(message);
-    }
-
-    return data;
+    toast.error(message);
+    throw new Error(message);
+  }
+  // ---- Success ----
+  toast.success(data?.detail || data?.message || "Request successful");
+  return data as T;
 }

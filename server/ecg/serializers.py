@@ -6,7 +6,6 @@ class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = '__all__'
-
     def create(self, validated_data):
         password = validated_data.pop('password')
         doctor = Doctor(**validated_data)
@@ -18,7 +17,6 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = '__all__'
-
     def create(self, validated_data):
         password = validated_data.pop('password')
         patient = Patient(**validated_data)

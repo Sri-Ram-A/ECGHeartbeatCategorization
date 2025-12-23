@@ -4,20 +4,22 @@ import json
 from loguru import logger
 from django.conf import settings
 from django.utils import timezone
-
+DEVICE_REGISTER_TOPIC = "devices/register"
+STREAM_TOPIC = "stream/+/+"
 class MQTTClient:
+
     def __init__(self):
         self.client = None
         self.connected = False
 
-    def on_connect(self, client, userdata, flags, rc, properties=None):
+    def on_connect(self, client, userdata, flags, rc,properties=None):
         if rc == 0:
-            logger.info("Connected to MQTT broker")
+            logger.success("Connected to MQTT broker")
             self.connected = True
             # Subscribe to all stream topics
-            client.subscribe("stream/+/+")
-            client.subscribe("devices/register")
-            logger.info("Subscribed to stream and device topics")
+            client.subscribe(STREAM_TOPIC)
+            client.subscribe(DEVICE_REGISTER_TOPIC)
+            logger.success(f"Subscribed to stream:{STREAM_TOPIC} and device:{DEVICE_REGISTER_TOPIC} topics")
         else:
             logger.error(f"Failed to connect to MQTT broker. RC={rc}")
 
@@ -29,12 +31,10 @@ class MQTTClient:
         try:
             topic = msg.topic
             payload = json.loads(msg.payload.decode())
-
-            if topic.startswith("stream/"):
+            if topic.startswith("stream"):
                 self.handle_ecg_stream(topic, payload)
-            elif topic == "devices/register":
+            elif topic == DEVICE_REGISTER_TOPIC:
                 self.handle_device_registration(payload)
-
         except Exception as e:
             logger.error(f"Error processing MQTT message: {e}")
 
@@ -46,8 +46,7 @@ class MQTTClient:
             timestamp = payload.get('timestamp')
             values = payload.get('values')
             device_id = payload.get('device_id')
-            
-            logger.info(f"ECG Stream - Doctor:{doctor_id} Patient:{patient_id} Device:{device_id}")
+            logger.info(f"ECG Stream - Doctor:{doctor_id} Patient:{patient_id}")
             
             # TODO: Add your processing logic:
             # - Store in database
@@ -58,15 +57,13 @@ class MQTTClient:
     def handle_device_registration(self, payload):
         """Handle device registration"""
         from .models import Device
-        
         device_id = payload.get('device_id')
         if device_id:
             device, created = Device.objects.get_or_create(device_id=device_id)
             device.last_seen = timezone.now()
             device.save()
-            
             if created:
-                logger.info(f"New device registered: {device_id}")
+                logger.success(f"New device registered: {device_id}")
             else:
                 logger.info(f"Device updated: {device_id}")
 
