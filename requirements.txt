@@ -1,14 +1,13 @@
-numpy
-pandas
-matplotlib
-tqdm
-kagglehub
+# paho-mqtt
+# loguru
+# Django
+# djangorestframework
+# django-cors-headers
+# paho-mqtt
+# python-dotenv
+# drf-spectacular
 paho-mqtt
 loguru
-
-Django
-djangorestframework
-django-cors-headers
-paho-mqtt
 python-dotenv
-drf-spectacular
+getmac
+numpy

@@ -4,55 +4,57 @@ import json
 from loguru import logger
 from django.conf import settings
 from django.utils import timezone
+
 DEVICE_REGISTER_TOPIC = "devices/register"
-STREAM_TOPIC = "stream/+/+"
+ECG_STREAM_TOPIC = "stream/+/+"
+PREDICTION_TOPIC = "prediction/+/+"
+
 class MQTTClient:
 
     def __init__(self):
         self.client = None
         self.connected = False
 
-    def on_connect(self, client, userdata, flags, rc,properties=None):
+    def on_connect(self, client, userdata, flags, rc, properties=None):
         if rc == 0:
-            logger.success("Connected to MQTT broker")
             self.connected = True
-            # Subscribe to all stream topics
-            client.subscribe(STREAM_TOPIC)
-            client.subscribe(DEVICE_REGISTER_TOPIC)
-            logger.success(f"Subscribed to stream:{STREAM_TOPIC} and device:{DEVICE_REGISTER_TOPIC} topics")
-        else:
-            logger.error(f"Failed to connect to MQTT broker. RC={rc}")
+            client.subscribe([
+                (ECG_STREAM_TOPIC, 1),
+                (PREDICTION_TOPIC, 1),
+                (DEVICE_REGISTER_TOPIC, 1)
+            ])
+            logger.success("MQTT connected & subscribed")
 
     def on_disconnect(self, client, packet, exc=None):
         logger.warning("Disconnected from MQTT broker")
         self.connected = False
 
     def on_message(self, client, userdata, msg):
-        try:
-            topic = msg.topic
-            payload = json.loads(msg.payload.decode())
-            if topic.startswith("stream"):
-                self.handle_ecg_stream(topic, payload)
-            elif topic == DEVICE_REGISTER_TOPIC:
-                self.handle_device_registration(payload)
-        except Exception as e:
-            logger.error(f"Error processing MQTT message: {e}")
+        payload = json.loads(msg.payload.decode())
+        topic = msg.topic
+
+        if topic == DEVICE_REGISTER_TOPIC:
+            self.handle_device_registration(payload)
+        
+        elif topic.startswith("stream"):
+            self.handle_ecg_stream(topic, payload)
+
+        elif topic.startswith("prediction"):
+            self.handle_prediction(topic, payload)
 
     def handle_ecg_stream(self, topic, payload):
-        """Process incoming ECG data"""
-        parts = topic.split("/")
-        if len(parts) == 3:
-            _, doctor_id, patient_id = parts
-            timestamp = payload.get('timestamp')
-            values = payload.get('values')
-            device_id = payload.get('device_id')
-            logger.info(f"ECG Stream - Doctor:{doctor_id} Patient:{patient_id}")
-            
-            # TODO: Add your processing logic:
-            # - Store in database
-            # - Run ML inference
-            # - Detect anomalies
-            # - Broadcast to frontend via WebSocket/Channels
+        _, doctor_id, patient_id = topic.split("/")
+        values = payload["values"]
+        logger.info(f"ECG RX | D:{doctor_id} P:{patient_id}")
+        # Store / forward via WebSocket later
+
+    def handle_prediction(self, topic, payload):
+        _, doctor_id, patient_id = topic.split("/")
+        prediction = payload["prediction"]
+        confidence = payload.get("confidence")
+        logger.success(f"PREDICTION | D:{doctor_id} P:{patient_id} → {prediction}")
+
+        # Save verdict to RecordingSession
 
     def handle_device_registration(self, payload):
         """Handle device registration"""

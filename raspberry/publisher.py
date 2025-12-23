@@ -24,11 +24,13 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
 # Global vars
 DATASET_PATH = BASE_DIR / "data" /"1"/ "mitbih_test.csv"
 PATIENT_ID = "2"
-DOCTOR_ID = "2"
+DOCTOR_ID = "1"
 DEVICE_ID = f"{socket.gethostname()}_{get_mac_address()}"
+
 DEVICE_REGISTER_TOPIC = "devices/register"
 STREAM_TOPIC = f"stream/{DOCTOR_ID}/{PATIENT_ID}"
 COMMANDS_TOPIC = f"commands/{DOCTOR_ID}/{PATIENT_ID}"
+
 # Global state
 streaming = False
 
@@ -69,13 +71,11 @@ def register_device(client):
     client.publish(DEVICE_REGISTER_TOPIC, json.dumps(payload))
     logger.info(f"Device registered: {DEVICE_ID}")
 
-
 def publish_ecg_data(client, ecg_values):
     """Publish ECG data to MQTT topic"""
     payload = {
         "timestamp": datetime.now().isoformat(),
         "values": ecg_values,
-        "device_id":DEVICE_ID
     }
     client.publish(STREAM_TOPIC, json.dumps(payload))
     logger.debug(f"Published {len(ecg_values)} values to {STREAM_TOPIC}")
