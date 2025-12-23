@@ -32,19 +32,13 @@ MODEL = load_model()
 
 # INFERENCE
 def run_model(values):
-    """
-    Run inference on ECG values.
-    Replace with real inference logic.
-    """
+    """Run inference on ECG values."""
     # Example dummy logic
     prediction = "Dead"
     confidence = 0.72
     return prediction, confidence
 
-# =====================================================
 # MQTT CALLBACKS
-# =====================================================
-
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
         logger.success("Jetson connected to MQTT broker")
@@ -62,10 +56,8 @@ def on_message(client, userdata, msg):
         topic = msg.topic
         # stream/{doctor}/{patient}
         _, doctor_id, patient_id = topic.split("/")
-
         values = payload.get("values")
         timestamp = payload.get("timestamp")
-
         if not values:
             logger.warning("Empty ECG payload received")
             return

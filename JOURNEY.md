@@ -34,3 +34,6 @@ ngrok http --url=cub-true-shiner.ngrok-free.app http://127.0.0.1:8000/
 ```
 - Hosting frontend to vercel : https://vercel.com/new/sriramaai23-rvceeduins-projects
 - Frontend link : https://ecg-heartbeat-categorization.vercel.app
+- Today facing problem due to : localStorage is shared across ALL tabs of the same origin.
+- For demo purposes I am going to use : sessionStorage
+- Finally in end 

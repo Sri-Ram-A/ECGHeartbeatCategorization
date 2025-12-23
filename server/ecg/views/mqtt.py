@@ -59,7 +59,7 @@ class StopStreamingView(APIView):
         session.stopped_at = timezone.now()
         session.save()
         # Publish MQTT stop command
-        topic = f"commands/{doctor_id}/{patient_id}"
+        topic = COMMAND_TOPIC_FMT.format(doctor_id = doctor_id,patient_id = patient_id)
         mqtt_client.publish(topic, "stop")
         logger.warning(f"Sent STOP command to {topic}")
         return Response({

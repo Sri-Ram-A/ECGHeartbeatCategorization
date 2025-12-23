@@ -25,8 +25,8 @@ class MQTTClient:
             ])
             logger.success("MQTT connected & subscribed")
 
-    def on_disconnect(self, client, packet, exc=None):
-        logger.warning("Disconnected from MQTT broker")
+    def on_disconnect(self, client, userdata, rc, properties=None):
+        logger.warning(f"Disconnected from MQTT broker (rc={rc})")
         self.connected = False
 
     def on_message(self, client, userdata, msg):
