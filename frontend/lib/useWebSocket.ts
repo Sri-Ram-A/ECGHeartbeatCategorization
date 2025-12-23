@@ -12,15 +12,7 @@ interface UseWebSocketOptions {
 }
 
 export const useWebSocket = (options: UseWebSocketOptions) => {
-  const {
-    url,
-    onMessage,
-    onBinary,
-    onOpen,
-    onClose,
-    onError,
-    autoConnect = false,
-  } = options
+  const { url, onMessage, onBinary, onOpen, onClose, onError, autoConnect = false, } = options
 
   const [isConnected, setIsConnected] = useState(false)
   const wsRef = useRef<WebSocket | null>(null)

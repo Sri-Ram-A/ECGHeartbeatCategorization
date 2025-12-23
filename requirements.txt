@@ -11,3 +11,4 @@ loguru
 python-dotenv
 getmac
 numpy
+channels[daphne]

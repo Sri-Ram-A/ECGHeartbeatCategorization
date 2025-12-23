@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import makeRequest from "@/services/request";
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -71,7 +73,8 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
             </section>
 
             {/* Right Section: Form */}
-            <section className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-gradient-to-bl from-purple-400 via-blue-900 to-black relative rounded-l-4xl">
+            <section className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 
+                bg-gradient-to-bl from-blue-950 via-slate-900 to-black relative ">
 
                 {/* Form Container */}
                 <div className="w-full max-w-md relative z-10 p-6 space-y-6">
@@ -88,107 +91,77 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-3">
-                        {/* Full Name */}
-                        <div className="space-y-2">
-                            <label htmlFor="full_name" className="block text-sm font-medium text-white/90">Full Name</label>
-                            <input
-                                id="full_name"
-                                type="text"
-                                value={form.full_name}
-                                onChange={(e) => update("full_name", e.target.value)}
-                                placeholder="John Doe"
-                                required
-                                className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
-                            />
-                        </div>
+                        <Input
+                            id="full_name"
+                            label="Full Name"
+                            type="text"
+                            value={form.full_name}
+                            onChange={(e) => update("full_name", e.target.value)}
+                            placeholder="John Doe"
+                            required
+                        />
 
-                        {/* Doctor Specific Fields */}
                         {isDoctor && (
                             <>
-                                {/* Specialization */}
-                                <div className="space-y-2">
-                                    <label htmlFor="specialization" className="block text-sm font-medium text-white/90">Specialization</label>
-                                    <input
-                                        id="specialization"
-                                        type="text"
-                                        value={form.specialization}
-                                        onChange={(e) => update("specialization", e.target.value)}
-                                        placeholder="Cardiology"
-                                        required
-                                        className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
-                                    />
-                                </div>
+                                <Input
+                                    id="specialization"
+                                    label="Specialization"
+                                    type="text"
+                                    value={form.specialization}
+                                    onChange={(e) => update("specialization", e.target.value)}
+                                    placeholder="Cardiology"
+                                    required
+                                />
 
-                                {/* License Number */}
-                                <div className="space-y-2">
-                                    <label htmlFor="license_number" className="block text-sm font-medium text-white/90">License Number</label>
-                                    <input
-                                        id="license_number"
-                                        type="text"
-                                        value={form.license_number}
-                                        onChange={(e) => update("license_number", e.target.value)}
-                                        placeholder="MD123456"
-                                        required
-                                        className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
-                                    />
-                                </div>
+                                <Input
+                                    id="license_number"
+                                    label="License Number"
+                                    type="text"
+                                    value={form.license_number}
+                                    onChange={(e) => update("license_number", e.target.value)}
+                                    placeholder="MD123456"
+                                    required
+                                />
                             </>
                         )}
 
-                        {/* Phone Number */}
-                        <div className="space-y-2">
-                            <label htmlFor="phone_number" className="block text-sm font-medium text-white/90">Phone Number</label>
-                            <input
-                                id="phone_number"
-                                type="tel"
-                                // You might want to adjust the pattern for international numbers
-                                pattern="\d{10}"
-                                value={form.phone_number}
-                                onChange={(e) => update("phone_number", e.target.value)}
-                                placeholder="1234567890"
-                                required
-                                className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
-                            />
-                        </div>
+                        <Input
+                            id="phone_number"
+                            label="Phone Number"
+                            type="tel"
+                            pattern="[0-9]{10}"
+                            value={form.phone_number}
+                            onChange={(e) => update("phone_number", e.target.value)}
+                            placeholder="1234567890"
+                            required
+                            maxLength={10}
+                            inputMode="numeric"
+                        />
 
-                        {/* Password */}
-                        <div className="space-y-2">
-                            <label htmlFor="password" className="block text-sm font-medium text-white/90">Password</label>
-                            <input
-                                id="password"
-                                type="password"
-                                value={form.password}
-                                onChange={(e) => update("password", e.target.value)}
-                                placeholder="Create a secure password (min 8 characters)"
-                                required
-                                className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
-                            />
-                        </div>
+                        <Input
+                            id="password"
+                            label="Password"
+                            type="password"
+                            value={form.password}
+                            onChange={(e) => update("password", e.target.value)}
+                            placeholder="Create a secure password (min 8 characters)"
+                            required
+                        />
 
-                        {/* Patient Birthdate */}
                         {!isDoctor && (
-                            <div className="space-y-2">
-                                <label htmlFor="dob" className="block text-sm font-medium text-white/90">
-                                    Date of Birth
-                                </label>
-                                <input
-                                    id="dob"
-                                    type="date"
-                                    value={form.dob}
-                                    onChange={(e) => update("dob", e.target.value)}
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white 
-                       placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 
-                       focus:bg-white/10 transition-all duration-200"
-                                />
-                            </div>
+                            <Input
+                                id="dob"
+                                label="Date of Birth"
+                                type="date"
+                                value={form.dob}
+                                onChange={(e) => update("dob", e.target.value)}
+                                required
+                            />
                         )}
 
-                        {/* Submit Button */}
-                        <button
-                            type="submit"
-                            className="w-full px-4 py-3 mt-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30"
-                        >Create Account</button>
+                        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                            Create Account
+                        </Button>
                     </form>
 
                     {/* Footer / Login Link */}

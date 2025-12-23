@@ -23,8 +23,8 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
 
 # Global vars
 DATASET_PATH = BASE_DIR / "mitbih_test.csv"
-PATIENT_ID = "2"
-DOCTOR_ID = "2"
+DOCTOR_ID = "1"
+PATIENT_ID = "1"
 DEVICE_ID = f"{socket.gethostname()}_{get_mac_address()}"
 
 DEVICE_REGISTER_TOPIC = "devices/register"

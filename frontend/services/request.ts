@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "@/services/api";
-import { toast } from "react-toastify";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 type HttpMethod = "GET" | "POST";
 
@@ -40,7 +40,7 @@ export default async function makeRequest<T = any>({
   try {
     data = await res.json();
   } catch {
-    toast.error(`Invalid JSON response (${res.status})`);
+    notifyError(`Invalid JSON response (${res.status})`);
     throw new Error("Invalid JSON response from server");
   }
   // ---- Error handling ----
@@ -51,10 +51,10 @@ export default async function makeRequest<T = any>({
       data?.message ||
       `Request failed (${res.status})`;
 
-    toast.error(message);
+    notifyError(message);
     throw new Error(message);
   }
   // ---- Success ----
-  toast.success(data?.detail || data?.message || "Request successful");
+  notifySuccess(data?.detail || data?.message || "Request successful");
   return data as T;
 }

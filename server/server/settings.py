@@ -41,13 +41,17 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    "daphne", ###
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ecg', 'rest_framework', 'corsheaders', ###
-    'drf_spectacular',###
+    'ecg', ###,
+    'live_signals', ###
+    'rest_framework',
+    'corsheaders', ###
+    'drf_spectacular', ###
 ]
 ###
 REST_FRAMEWORK = {
@@ -83,9 +87,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'server.wsgi.application'
+# WSGI_APPLICATION = 'server.wsgi.application' ###
+ASGI_APPLICATION = "server.asgi.application" ###
 
-
+###
+# AttributeError: 'NoneType' object has no attribute 'group_add'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+###
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 

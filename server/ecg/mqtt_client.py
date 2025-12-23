@@ -4,11 +4,14 @@ import json
 from loguru import logger
 from django.conf import settings
 from django.utils import timezone
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 DEVICE_REGISTER_TOPIC = "devices/register"
 ECG_STREAM_TOPIC = "stream/+/+"
 PREDICTION_TOPIC = "prediction/+/+"
-
+CHANNEL_LAYER = get_channel_layer()
+GROUP_NAME = "live_signals_{doctor_id}_{patient_id}"
 class MQTTClient:
 
     def __init__(self):
@@ -45,15 +48,21 @@ class MQTTClient:
     def handle_ecg_stream(self, topic, payload):
         _, doctor_id, patient_id = topic.split("/")
         values = payload["values"]
-        logger.info(f"ECG RX | D:{doctor_id} P:{patient_id}")
+        logger.info(f"ECG RX from  | D:{doctor_id} P:{patient_id}")
         # Store / forward via WebSocket later
+        payload = {
+            "doctor_id":doctor_id,
+            "patient_id":patient_id,
+            "values": values
+        }
+        self.send_live_signals(doctor_id,patient_id,payload)
 
     def handle_prediction(self, topic, payload):
         _, doctor_id, patient_id = topic.split("/")
         prediction = payload["prediction"]
         confidence = payload.get("confidence")
         logger.success(f"PREDICTION | D:{doctor_id} P:{patient_id} → {prediction}")
-
+        
         # Save verdict to RecordingSession
 
     def handle_device_registration(self, payload):
@@ -68,6 +77,19 @@ class MQTTClient:
                 logger.success(f"New device registered: {device_id}")
             else:
                 logger.info(f"Device updated: {device_id}")
+
+    def  send_live_signals(self,doctor_id,patient_id,payload):
+        try:
+            group_name = GROUP_NAME.format(doctor_id=doctor_id,patient_id=patient_id)
+            async_to_sync(CHANNEL_LAYER.group_send)(
+                group_name,
+                {
+                    "type": "ecg.message",  # will call ecg_message on consumers
+                    "data": payload
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to forward ECG to websocket group {group_name}: {e}")
 
     def connect(self):
         """Initialize and connect to MQTT broker"""

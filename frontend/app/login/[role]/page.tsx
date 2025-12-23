@@ -5,6 +5,8 @@ import { Inter } from "next/font/google";
 import { setSession } from '@/lib/session';
 import { useRouter } from 'next/navigation';
 import makeRequest from "@/services/request";
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -67,45 +69,29 @@ export default function LoginPage({ params }: { params: Promise<{ role: string }
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username */}
-            <div className="space-y-2">
-              <label htmlFor="full_name" className="block text-sm font-medium text-white/90">
-                Username
-              </label>
-              <input
-                id="full_name"
-                type="text"
-                value={form.full_name}
-                onChange={(e) => update("full_name", e.target.value)}
-                placeholder="Enter your full_name"
-                required
-                className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
-              />
-            </div>
+            <Input
+              id="full_name"
+              label="Username"
+              type="text"
+              value={form.full_name}
+              onChange={(e) => update("full_name", e.target.value)}
+              placeholder="Enter your full name"
+              required
+            />
 
-            {/* Password */}
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-white/90">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={form.password}
-                onChange={(e) => update("password", e.target.value)}
-                placeholder="Enter your password"
-                required
-                className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all duration-200 shadow-inner shadow-black/20"
-              />
-            </div>
+            <Input
+              id="password"
+              label="Password"
+              type="password"
+              value={form.password}
+              onChange={(e) => update("password", e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full px-4 py-3 mt-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30"
-            >
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
               Sign In
-            </button>
+            </Button>
           </form>
 
           {/* Footer / Register Link */}
