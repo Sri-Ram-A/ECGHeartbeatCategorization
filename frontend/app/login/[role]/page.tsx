@@ -113,7 +113,7 @@ export default function LoginPage({ params }: { params: Promise<{ role: string }
       <section className="hidden lg:flex lg:w-1/2 relative bg-[#091020] items-end p-24">
         {/* Video */}
         <video muted loop autoPlay playsInline className="absolute inset-0 h-full w-full object-cover" >
-          <source src="/log.mp4" type="video/mp4" />
+          <source src="/videos/login.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
 

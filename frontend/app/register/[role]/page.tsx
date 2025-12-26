@@ -60,11 +60,11 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
             <section className="hidden lg:flex lg:w-1/2 relative bg-black items-end p-8">
                 {/* Left Video */}
                 <video muted loop autoPlay playsInline className="absolute inset-0 h-full w-full object-cover">
-                    <source src="/jellyfish.mp4" type="video/mp4" />
+                    <source src="/videos/white_heart.mp4" type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
                 {/* Dark/Blue Overlay (for color/mood shift) */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent"></div>
                 {/* Left Content */}
                 <div className="relative z-10 text-white space-y-4 pb-36">
                     <h2 className="text-4xl font-extrabold leading-tight">Healthcare Platform</h2>

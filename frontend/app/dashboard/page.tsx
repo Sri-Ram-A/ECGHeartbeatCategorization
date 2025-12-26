@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/Button"
 import { Table, Column } from "@/components/ui/Table"
 import { Spotlight } from "@/components/ui/spotlight"
 import { EcgAreaChart } from "@/components/ui/EcgAreaChart"
-
+import {BACKEND_WS_URL}  from "@/services/api"
 interface Patient {
     id: number
     full_name: string
@@ -83,7 +83,7 @@ export default function DashboardPage() {
     /* ---------------- WS URL ---------------- */
     const wsUrl = useMemo(() => {
         if (!doctor || !selectedPatientId) return ""
-        return `ws://localhost:8000/ws/ecg/${doctor.id}/${selectedPatientId}/`
+        return `${BACKEND_WS_URL}/ws/ecg/${doctor.id}/${selectedPatientId}/`
     }, [doctor, selectedPatientId])
 
     /* ---------------- WEBSOCKET ---------------- */
