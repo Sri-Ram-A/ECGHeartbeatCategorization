@@ -42,3 +42,10 @@ ngrok http --url=cub-true-shiner.ngrok-free.app http://127.0.0.1:8000/
 - https://channels.readthedocs.io/en/latest/installation.html
 - https://channels.readthedocs.io/en/latest/tutorial/part_2.html
 - https://github.com/django/channels/issues/1634
+
+# Frontend
+- GSAP : https://gsap.com/resources/React/
+
+# TFlite :
+- https://developer.android.com/codelabs/digit-classifier-tflite#1
+

@@ -1,14 +1,13 @@
-# paho-mqtt
-# loguru
-# Django
-# djangorestframework
-# django-cors-headers
-# paho-mqtt
-# python-dotenv
-# drf-spectacular
+paho-mqtt
+loguru
+Django
+djangorestframework
+django-cors-headers
+python-dotenv
+drf-spectacular
+channels[daphne]
 paho-mqtt
 loguru
 python-dotenv
 getmac
 numpy
-channels[daphne]
