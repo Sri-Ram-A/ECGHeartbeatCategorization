@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from ecg.mqtt_client import mqtt_client
-from ecg.serializers import StartStreamingSerializer,StopStreamingSerializer
+from ecg.serializers.mqtt import StartStreamingSerializer,StopStreamingSerializer
 from loguru import logger
 COMMAND_TOPIC_FMT = "commands/{doctor_id}/{patient_id}"
 
