@@ -2,25 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from ecg.models import Doctor, Patient
-from ecg.serializers import DoctorSerializer, PatientSerializer
+from ecg.serializers import DoctorSerializer, PatientSerializer,DoctorLoginSerializer,PatientLoginSerializer
 from typing import cast
 from loguru import logger
-
+from pprint import pformat
 
 class DoctorRegisterView(APIView):
+    serializer_class = DoctorSerializer
+
     def post(self, request):
-        full_name = request.data.get('full_name')
-        phone_number = request.data.get('phone_number')
-        # IF already someone exists
-        if Doctor.objects.filter(
-            full_name=full_name, phone_number=phone_number).exists():
-            return Response(
-                {'error': 'Doctor already exists',
-                 'message': 'Doctor already exists'},
-                status=status.HTTP_409_CONFLICT
-            )
-        # If None Exists
-        serializer = DoctorSerializer(data=request.data)
+        logger.debug(f"Request details:\n{pformat(request.__dict__)}")
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             doctor = cast(Doctor, serializer.save())
             return Response(
@@ -30,85 +22,45 @@ class DoctorRegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PatientRegisterView(APIView):
+    serializer_class = PatientSerializer
     def post(self, request):
-        full_name = request.data.get('full_name')
-        phone_number = request.data.get('phone_number')
-        # IF already someone exists
-        if Patient.objects.filter(
-            full_name=full_name, phone_number=phone_number).exists():
-            return Response(
-                {'error': 'Patient already exists'},
-                status=status.HTTP_409_CONFLICT
-            )
-        # If None Exists
-        serializer = PatientSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             patient = cast(Patient,serializer.save())
             return Response(
                 {'status': 'success', 'patient_id': patient.id},
                 status=status.HTTP_201_CREATED
             )
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DoctorLoginView(APIView):
+    serializer_class = DoctorLoginSerializer
+
     def post(self, request):
-        full_name = request.data.get('full_name')
-        password = request.data.get('password')
-        if not full_name or not password:
-            return Response(
-                {'error': 'Missing credentials',
-                 'message': 'Missing credentials'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        try:
-            doctor = Doctor.objects.get(full_name=full_name)
-        except Doctor.DoesNotExist:
-            return Response(
-                {'error': 'Doctor not found',
-                 'message': 'Doctor not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        if not doctor.check_password(password):
-            return Response(
-                {'error': 'Invalid password',
-                 'message': 'Invalid password'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        return Response({
-            'status': 'success',
-            'id': doctor.id,
-            'full_name': doctor.full_name
-        })
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        doctor = serializer.validated_data.get("doctor")
+        return Response(
+            {
+                "status": "success",
+                "id": doctor.id,
+                "full_name": doctor.full_name,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 class PatientLoginView(APIView):
+    serializer_class = PatientLoginSerializer
+
     def post(self, request):
-        full_name = request.data.get('full_name')
-        password = request.data.get('password')
-
-        if not full_name or not password:
-            return Response(
-                {'error': 'Missing credentials',
-                 'message': 'Missing credentials'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        try:
-            patient = Patient.objects.get(full_name=full_name)
-        except Patient.DoesNotExist:
-            return Response(
-                {'error': 'Patient not found',
-                 'message': 'Patient not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        if not patient.check_password(password):
-            return Response(
-                {'error': 'Invalid password',
-                 'message': 'Invalid password'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        return Response({
-            'status': 'success',
-            'id': patient.id,
-            'full_name': patient.full_name
-        })
-
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        patient = serializer.validated_data.get("patient")
+        return Response(
+            {
+                "status": "success",
+                "id": patient.id,
+                "full_name": patient.full_name,
+            },
+            status=status.HTTP_200_OK,
+        )

@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from drf_spectacular.views import (SpectacularAPIView,SpectacularSwaggerView,SpectacularRedocView)
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.http import JsonResponse
 
 def root_view(request):
@@ -24,7 +24,6 @@ def root_view(request):
         "message": "Welcome to my API endpoints",
         "docs": {
             "swagger": "/swagger/",
-            "redoc": "/redoc/",
             "schema": "/schema/",
             "api": "/api/"
         }
@@ -35,9 +34,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('api/', include('ecg.urls')),  # Include your app URLs
-
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
 ]

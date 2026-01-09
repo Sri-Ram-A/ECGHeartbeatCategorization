@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from .models import Device
 
 DEVICE_REGISTER_TOPIC = "devices/register"
 ECG_STREAM_TOPIC = "stream/+/+"
@@ -62,12 +63,9 @@ class MQTTClient:
         prediction = payload["prediction"]
         confidence = payload.get("confidence")
         logger.success(f"PREDICTION | D:{doctor_id} P:{patient_id} → {prediction}")
-        
-        # Save verdict to RecordingSession
 
     def handle_device_registration(self, payload):
         """Handle device registration"""
-        from .models import Device
         device_id = payload.get('device_id')
         if device_id:
             device, created = Device.objects.get_or_create(device_id=device_id)
@@ -133,7 +131,6 @@ class MQTTClient:
             self.client.publish(topic, message)
         else:
             logger.warning("Cannot publish - MQTT client not connected")
-
 
 # Global MQTT client instance
 mqtt_client = MQTTClient()

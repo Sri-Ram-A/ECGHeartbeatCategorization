@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 from tflite_model import ECGTFLiteModel
 # ENV + CONFIG
-BASE_DIR = Path(__file__).resolve().parent
-print(BASE_DIR)
+BASE_DIR = Path(__file__).resolve().parents[1]
+logger.debug(f"Using base dir : {BASE_DIR}")
 load_dotenv(BASE_DIR / ".env")
 
 MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
@@ -24,13 +24,10 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")
 ECG_STREAM_TOPIC = "stream/+/+"
 PREDICTION_TOPIC_FMT = "prediction/{doctor_id}/{patient_id}"
 INPUT_LENGTH = 187
-MODEL_PATH = BASE_DIR / "models" / "1dcnn.tflite"
+MODEL_PATH = Path(__file__).resolve().parent / "models" / "1dcnn.tflite"
 
 # MODEL (LOAD ONCE)
-def load_tflite_model(model_path: Path=MODEL_PATH):
-    return ECGTFLiteModel(model_path)
-INPUT_LENGTH
-MODEL = load_tflite_model(MODEL_PATH)
+MODEL = ECGTFLiteModel(MODEL_PATH)
    
 # INFERENCE
 def run_model(values):
@@ -60,7 +57,6 @@ def on_message(client, userdata, msg):
 
         values = payload.get("values")
         timestamp = payload.get("timestamp")
-
         if not values:
             logger.warning("Empty ECG payload received")
             return
@@ -73,12 +69,7 @@ def on_message(client, userdata, msg):
             "timestamp": timestamp,
             "processed_at": datetime.utcnow().isoformat(),
         }
-
-        pred_topic = PREDICTION_TOPIC_FMT.format(
-            doctor_id=doctor_id,
-            patient_id=patient_id
-        )
-
+        pred_topic = PREDICTION_TOPIC_FMT.format(doctor_id=doctor_id,patient_id=patient_id)
         client.publish(pred_topic, json.dumps(out), qos=1)
         logger.success(f"PREDICTED | D:{doctor_id} P:{patient_id} → {prediction} ({confidence})")
 
