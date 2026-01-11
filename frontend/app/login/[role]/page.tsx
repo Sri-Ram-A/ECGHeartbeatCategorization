@@ -5,8 +5,8 @@ import { Inter } from "next/font/google";
 import { setSession } from '@/lib/session';
 import { useRouter } from 'next/navigation';
 import makeRequest from "@/services/request";
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/custom/Input';
+import { Button } from '@/components/ui/button';
 
 const inter = Inter({ subsets: ["latin"] });
 

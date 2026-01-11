@@ -63,7 +63,23 @@ class MQTTClient:
         _, doctor_id, patient_id = topic.split("/")
         prediction = payload["prediction"]
         confidence = payload.get("confidence")
+        group_name = GROUP_NAME.format(doctor_id=doctor_id,patient_id=patient_id)
         logger.success(f"PREDICTION | D:{doctor_id} P:{patient_id} → {prediction}")
+        try:
+            payload= {
+                "prediction": prediction,
+                "confidence":confidence
+            }
+            if CHANNEL_LAYER :
+                async_to_sync(CHANNEL_LAYER.group_send)(
+                    group_name,
+                    {
+                        "type": "send.prediction",  # will call send_prediction on consumers
+                        "data":payload
+                    }
+                )
+        except Exception as e:
+            logger.error(f"Failed to send prediction to websocket group {group_name}: {e}")
 
     def handle_device_registration(self, payload):
         """Handle device registration"""

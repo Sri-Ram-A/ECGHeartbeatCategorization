@@ -1,6 +1,6 @@
 "use client";
 
-import GradientText from "./ui/GradientText";
+import GradientText from "./custom/GradientText";
 import { Playfair_Display } from "next/font/google";
 
 const playfair_display = Playfair_Display({ subsets: ["latin"] });

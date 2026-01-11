@@ -22,3 +22,7 @@ class ECGConsumer(AsyncWebsocketConsumer):
     async def ecg_message(self, event):
         # event["data"] is expected to be JSON-serializable payload
         await self.send(text_data=json.dumps(event["data"]))
+        
+    async def send_prediction(self, event):
+        # event["data"] is expected to be JSON-serializable payload
+        await self.send(text_data=json.dumps(event["data"]))

@@ -1,7 +1,7 @@
 "use client";
 import { useScroll, useTransform } from "motion/react";
 import React from "react";
-import { GoogleGeminiEffect } from "@/components/ui/GoogleGeminiEffect";
+import { GoogleGeminiEffect } from "@/components/custom/GoogleGeminiEffect";
 import { Playfair_Display } from "next/font/google";
 
 const playfair_display = Playfair_Display({ subsets: ["latin"] });

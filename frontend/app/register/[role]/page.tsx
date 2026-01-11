@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import makeRequest from "@/services/request";
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/custom/Input';
+import { Button } from '@/components/ui/button';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -74,7 +74,7 @@ export default function RegisterPage({ params }: { params: Promise<{ role: strin
 
             {/* Right Section: Form */}
             <section className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 
-                bg-gradient-to-bl from-blue-950 via-slate-900 to-black relative ">
+                bg-linear-to-bl from-blue-950 via-slate-900 to-black relative ">
 
                 {/* Form Container */}
                 <div className="w-full max-w-md relative z-10 p-6 space-y-6">
