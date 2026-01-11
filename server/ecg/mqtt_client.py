@@ -13,6 +13,7 @@ ECG_STREAM_TOPIC = "stream/+/+"
 PREDICTION_TOPIC = "prediction/+/+"
 CHANNEL_LAYER = get_channel_layer()
 GROUP_NAME = "live_signals_{doctor_id}_{patient_id}"
+
 class MQTTClient:
 
     def __init__(self):
@@ -79,13 +80,14 @@ class MQTTClient:
     def  send_live_signals(self,doctor_id,patient_id,payload):
         try:
             group_name = GROUP_NAME.format(doctor_id=doctor_id,patient_id=patient_id)
-            async_to_sync(CHANNEL_LAYER.group_send)(
-                group_name,
-                {
-                    "type": "ecg.message",  # will call ecg_message on consumers
-                    "data": payload
-                }
-            )
+            if CHANNEL_LAYER :
+                async_to_sync(CHANNEL_LAYER.group_send)(
+                    group_name,
+                    {
+                        "type": "ecg.message",  # will call ecg_message on consumers
+                        "data": payload
+                    }
+                )
         except Exception as e:
             logger.error(f"Failed to forward ECG to websocket group {group_name}: {e}")
 
