@@ -17,7 +17,7 @@ from dotenv import load_dotenv ###
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 ### Added by me
-load_dotenv(dotenv_path= BASE_DIR / '.env')
+load_dotenv(dotenv_path = BASE_DIR / '.env')
 # MQTT Configuration
 MQTT_HOST = os.getenv('MQTT_HOST', 'localhost')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 8883))
@@ -27,18 +27,13 @@ MQTT_PASSWORD = os.getenv('MQTT_PASSWORD')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-dc+plm$i-!^a_l!tq2b=9z*bh7*qe4ay0ad7)9w!8-t$oxn+4='
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     "daphne", ###
@@ -47,11 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',###
+    'corsheaders', ###
     'ecg', ###,
     'live_signals', ###
-    'rest_framework',
-    'corsheaders', ###
     'drf_spectacular', ###
+    'channels',###
+    'celery',###
+    'django_celery_beat',###
 ]
 ###
 REST_FRAMEWORK = {
@@ -92,11 +90,13 @@ ASGI_APPLICATION = "server.asgi.application" ###
 
 ###
 # AttributeError: 'NoneType' object has no attribute 'group_add'
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
+
+
 ###
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -104,6 +104,7 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        # 'ENGINE': 'timescale.db.backends.postgresql',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
@@ -111,41 +112,33 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
-
 STATIC_URL = 'static/'
 
-### Added by ,e
+### Added by me
+CHANNEL_LAYERS = {
+    "default": {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',  # Use Redis as the channel layer backend
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],  # Adjust the host and port as per your Redis configuration
+        },
+    }
+}
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -157,3 +150,16 @@ from corsheaders.defaults import default_headers
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "ngrok-skip-browser-warning",
 ]
+# set the celery broker url
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# set the celery result backend
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# set the celery timezone
+CELERY_TIMEZONE = 'Asia/Karachi'
+
+CELERY_BEAT_SCHEDULE = {
+    "persist-ecg-every-5-seconds": {
+        "task": "ecg.tasks.persist_all_ecg_streams",
+        "schedule": 5.0,
+    }
+}

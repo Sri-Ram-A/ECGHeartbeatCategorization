@@ -146,7 +146,7 @@ export default function PremiumECGDashboard() {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex flex-col items-end">
               <span className="text-sm font-medium text-slate-200">{doctor?.name}</span>
-              <span className="text-xs text-slate-500">Cardiologist</span>
+              <span className="text-xs text-slate-500">Cardiologist ID: {doctor?.id}</span>
             </div>
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-800">
               <LogOut className="w-5 h-5 text-slate-400" />

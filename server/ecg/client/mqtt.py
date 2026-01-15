@@ -6,13 +6,19 @@ from django.conf import settings
 from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from .models import Device
+from ecg.models import Device
+from ecg import tasks  
+import time,json
+from ecg.client.redis import get_redis
+r = get_redis()
 
 DEVICE_REGISTER_TOPIC = "devices/register"
 ECG_STREAM_TOPIC = "stream/+/+"
 PREDICTION_TOPIC = "prediction/+/+"
 CHANNEL_LAYER = get_channel_layer()
 GROUP_NAME = "live_signals_{doctor_id}_{patient_id}"
+REDIS_SESSION_FRMT = "ecg:session:{doctor_id}/{patient_id}"
+
 
 class MQTTClient:
 
@@ -58,6 +64,22 @@ class MQTTClient:
             "values": values
         }
         self.send_live_signals(doctor_id,patient_id,payload)
+        payload = {
+                "ts": time.time_ns(),
+                "values": json.dumps(values)
+        }
+        r.xadd(
+            REDIS_SESSION_FRMT.format(doctor_id=doctor_id,patient_id=patient_id),
+            {
+                "ts": time.time_ns(),
+                "values": json.dumps(values)
+            },
+            maxlen=10000,
+            approximate=True
+        )
+        # persist_ecg_data_task.delay(session_id, values, datetime.now())
+
+        
 
     def handle_prediction(self, topic, payload):
         _, doctor_id, patient_id = topic.split("/")

@@ -49,3 +49,75 @@ ngrok http --url=cub-true-shiner.ngrok-free.app http://127.0.0.1:8000/
 # TFlite :
 - https://developer.android.com/codelabs/digit-classifier-tflite#1
 
+
+# using redis streams 
+- https://medium.com/subex-ai-labs/working-with-redis-streams-in-python-basic-30f97055f61a
+- https://hub.docker.com/_/redis
+- GUI to view redis : https://hub.docker.com/r/redis/redisinsight
+- But for this to work we should make a network for both containers to communicate 
+```bash
+# Gpt + custom commands
+docker network create redis-network
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  --network redis-network \
+  redis
+
+docker run -d \
+  --name redisinsight \
+  -p 5540:5540 \
+  --network redis-network \
+  redis/redisinsight:latest
+#   To check if both are in same network
+docker network inspect redis-network
+docker exec -it redisinsight ping redis
+```
+```java
+// output must be like this if its working
+If you get:
+PING redis (172.xx.x.x): 56 data bytes
+Docker DNS is working. RedisInsight can see Redis.
+```
+Add Redis connection in GUI
+
+In RedisInsight UI:
+```bash
+Host: redis
+Port: 6379
+Username: (leave empty unless ACLs enabled)
+Password: (leave empty unless auth enabled)
+```
+
+```bash
+docker exec -it redis redis-cli
+```
+ check through python cli
+ ```bash
+ try:
+    response = redisCli.ping()
+    print("Redis alive:", response)  # True
+except redis.exceptions.ConnectionError as e:
+    print("Redis down:", e)
+ ```
+- https://redis.io/docs/latest/develop/data-types/streams/
+
+# Setting up Celery for db logic
+- https://medium.com/@codealfi/building-a-real-time-chat-application-with-django-channels-and-redis-25395a9ffa81
+- Very iportant for coding : https://testdriven.io/blog/celery-database-transactions/
+
+- https://www.geeksforgeeks.org/python/celery-integration-with-django/
+```bash
+cd server
+celery -A server worker -l info
+# -A → Django project
+# worker → run executor
+# -l info → log level
+```
+```bash
+celery -A server beat -l info
+# This process:
+# Wakes up every few seconds
+# Sends scheduled tasks to Redis
+# Workers pick them up
+```

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+# from timescale.db.models.models import TimescaleModel
 
 class Doctor(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -50,3 +51,19 @@ class Device(models.Model):
     last_seen = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return self.device_id
+    
+class SensorReadings(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    session = models.ForeignKey(RecordingSession,on_delete=models.CASCADE,related_name="sensor_readings")
+    timestamp = models.DateTimeField(db_index=True)
+    ecg_values = models.JSONField() # 187 ECG values stored together
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["session", "timestamp"],
+                name="unique_sample"
+            )
+        ]
+
+    def __str__(self):
+        return f"ECG @ {self.timestamp} | Session {self.id}"
