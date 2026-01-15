@@ -121,3 +121,23 @@ celery -A server beat -l info
 # Sends scheduled tasks to Redis
 # Workers pick them up
 ```
+
+# TimeScaleDB docker with Django 
+- https://github.com/jamessewell/django-timescaledb
+- First shift from sqlite.db to https://medium.com/@jonas.granlund/running-django-with-postgresql-in-docker-a-step-by-step-guide-f6ab3bf05f44
+- Run timescaledb image https://www.tigerdata.com/docs/self-hosted/latest/install/installation-docker
+```bash
+docker run -d \
+--name timescaledb \
+-p 5432:5432  \
+-v /home/srirama/sr_proj/ECGHeartbeatCategorization/docker/pgdata:/pgdata -e PGDATA=/pgdata -e POSTGRES_PASSWORD=password timescale/timescaledb-ha:pg18
+```
+```bash
+docker exec -it timescaledb bash
+psql -U postgres
+# If you land in a postgres=# prompt, the DB is alive 🫀
+```
+PURGE stuck tasks from the broker (IMPORTANT)
+Your retries are sitting in Redis (or whatever broker you use).
+⚠️ This deletes all pending Celery tasks:
+celery -A server purge -f

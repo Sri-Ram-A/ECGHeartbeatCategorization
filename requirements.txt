@@ -9,6 +9,7 @@ python-dotenv
 django-timescaledb
 channels_redis
 redis
+psycopg[binary]
 
 paho-mqtt
 loguru

@@ -51,12 +51,7 @@ INSTALLED_APPS = [
     'celery',###
     'django_celery_beat',###
 ]
-###
-REST_FRAMEWORK = {
-    # YOUR SETTINGS
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-}
-###
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -89,23 +84,34 @@ TEMPLATES = [
 ASGI_APPLICATION = "server.asgi.application" ###
 
 ###
-# AttributeError: 'NoneType' object has no attribute 'group_add'
+## AttributeError: 'NoneType' object has no attribute 'group_add'
 # CHANNEL_LAYERS = {
 #     "default": {
 #         "BACKEND": "channels.layers.InMemoryChannelLayer"
 #     }
 # }
-
-
+###
 ###
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         # 'ENGINE': 'timescale.db.backends.postgresql',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+###
+# Database
+# https://medium.com/@jonas.granlund/running-django-with-postgresql-in-docker-a-step-by-step-guide-f6ab3bf05f44
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        # 'ENGINE': 'timescale.db.backends.postgresql',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'timescale.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -162,4 +168,7 @@ CELERY_BEAT_SCHEDULE = {
         "task": "ecg.tasks.persist_all_ecg_streams",
         "schedule": 5.0,
     }
+}
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
