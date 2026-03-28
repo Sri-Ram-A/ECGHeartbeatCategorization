@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'channels',###
     'celery',###
     'django_celery_beat',###
+    'schema_viewer', ###
 ]
 
 MIDDLEWARE = [
@@ -171,4 +172,5 @@ CELERY_BEAT_SCHEDULE = {
 }
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "EXCEPTION_HANDLER": "server.exceptions.custom_exception_handler",
 }

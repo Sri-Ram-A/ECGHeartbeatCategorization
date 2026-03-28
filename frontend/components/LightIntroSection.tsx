@@ -5,7 +5,7 @@ import { Playfair_Display } from "next/font/google";
 
 const playfair_display = Playfair_Display({ subsets: ["latin"] });
 
-export default function Home() {
+export default function IntroSection() {
   return (
     <>
       {/* Hero Section with Video Background */}
@@ -13,7 +13,7 @@ export default function Home() {
         {/* Background Video */}
         <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="/videos/light_heart.mp4" // <-- replace with your video path
+          src="/videos/white_heart.mp4" // <-- replace with your video path
           autoPlay
           loop
           muted

@@ -1,0 +1,13 @@
+ECG Classification Research Metrics
+========================================
+              precision    recall  f1-score   support
+
+      Normal       0.98      0.74      0.84     18118
+        SVEB       0.12      0.63      0.20       556
+         VEB       0.61      0.79      0.69      1448
+      Fusion       0.10      0.88      0.19       162
+     Unknown       0.82      0.93      0.87      1608
+
+    accuracy                           0.76     21892
+   macro avg       0.52      0.79      0.56     21892
+weighted avg       0.91      0.76      0.81     21892

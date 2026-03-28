@@ -10,44 +10,44 @@ const items = [
   {
     src: "/images/blue_girl.jpg",
     title: "Real-time Signal Streaming",
-    desc: "Low-latency MQTT pipelines for continuous medical data ingestion.",
+    desc: "Low-latency MQTT pipelines for continuous ECG data ingestion.",
     height: "h-[685px]",
   },
   {
     src: "/images/green_girl.jpg",
     title: "Edge-to-Cloud Messaging",
-    desc: "Secure MQTT communication from edge devices to cloud services.",
+    desc: "Django based backend for managing MQTT topics webscoket connections",
     height: "h-[300px]",
   },
   {
     src: "/images/white_boy.jpg",
-    title: "Device Telemetry",
-    desc: "Reliable publish–subscribe patterns for IoT healthcare devices.",
+    title: "Efficient Database Storage",
+    desc: "Celery Beat and Redis powered task queues for asynchronous processing.",
     height: "h-[360px]",
   },
   {
     src: "/images/white_man.jpg",
-    title: "Scalable Architecture",
-    desc: "Horizontally scalable brokers designed for hospital workloads.",
+    title: "Interlinked Protocols",
+    desc: "HTTP and MQTT protocols working in harmony for seamless data flow.",
     height: "h-[685px]",
   },
   {
     src: "/images/white_heart.jpg",
-    title: "Clinical-Grade Reliability",
-    desc: "Designed for fault tolerance and hospital-grade uptime.",
+    title: "Offloaded Data Processing",
+    desc: "TimescaleDB optimized for high-throughput time-series ECG data.",
     height: "h-[320px]",
   },
   {
     src: "/images/glass_human.png",
-    title: "Scalable Architecture",
-    desc: "Horizontally scalable brokers designed for hospital workloads.",
+    title: "Simple to register",
+    desc: "User-friendly interfaces for effortless device onboarding.",
     height: "h-[340px]",
   },
 ];
 
 export default function FeatureSection() {
   return (
-    <section className={`${playfair.className} relative bg-white py-32 overflow-hidden`}>
+    <section className={`${playfair.className} relative bg-white py-28 overflow-hidden border border-t`}>
       {/* Decorative blobs */}
       <motion.div
         className="absolute top-24 right-20 w-64 h-64 bg-linear-to-br from-purple-600 via-pink-500 to-orange-400 rounded-full blur-2xl opacity-20 pointer-events-none"
@@ -78,6 +78,17 @@ export default function FeatureSection() {
           ease: "linear",
         }}
       />
+      <div className="flex flex-col justify-center items-center">
+      <p className="text-primary font-semibold text-sm tracking-widest uppercase mb-2 ">
+        So What is this?
+      </p>
+      <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+        Features
+      </h2>
+      <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+
+      </p>
+      </div>
 
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">

@@ -27,11 +27,7 @@ interface Patient {
   last_visit?: string
 }
 
-/* ===================== LOGIC HOOKS ===================== */
 
-/**
- * Handles the logic for streaming ECG data and managing WebSocket state
- */
 const useEcgSession = (doctorId: number | null, patientId: number | null) => {
   const [ecgData, setEcgData] = useState<{ time: number; ecg: number }[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
@@ -88,9 +84,7 @@ const useEcgSession = (doctorId: number | null, patientId: number | null) => {
   return { ecgData, isStreaming, isConnected, prediction, startSession, stopSession }
 }
 
-/* ===================== COMPONENTS ===================== */
-
-export default function PremiumECGDashboard() {
+export default function ECGDashboard() {
   const [doctor, setDoctor] = useState<{ id: number; name: string } | null>(null)
   const [patients, setPatients] = useState<Patient[]>([])
   const [searchQuery, setSearchQuery] = useState("")

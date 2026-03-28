@@ -25,7 +25,8 @@ def root_view(request):
         "docs": {
             "swagger": "/swagger/",
             "schema": "/schema/",
-            "api": "/api/"
+            "api": "/api/",
+            'schema-viewer':'schema-viewer/',
         }
     })
 
@@ -36,5 +37,6 @@ urlpatterns = [
     path('api/', include('ecg.urls')),  # Include your app URLs
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema-viewer/', include('schema_viewer.urls')),
 
 ]

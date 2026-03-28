@@ -141,3 +141,7 @@ PURGE stuck tasks from the broker (IMPORTANT)
 Your retries are sitting in Redis (or whatever broker you use).
 ⚠️ This deletes all pending Celery tasks:
 celery -A server purge -f
+
+curl -X POST http://localhost:8000/api/mqtt/stop/1/1 \
+     -H "Content-Type: application/json" \
+     <!-- -d '{"key": "value", "another_key": "another_value"}' -->

@@ -14,9 +14,13 @@ export default function Navbar() {
     <nav className={`fixed top-0 left-0 w-full z-50 backdrop-blur ${merriweather.className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-xl font-extrabold text-indigo-600">
-          ECG-AI
-        </Link>
+        <div className="flex items-center gap-2">
+          <img src="/images/rvce_logo.png" className="h-20 w-20" />
+
+          <Link href="/" className="text-xl font-extrabold text-indigo-600">
+            ECG-AI
+          </Link>
+        </div>
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-6 text-sm font-extrabold">

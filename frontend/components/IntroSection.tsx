@@ -1,7 +1,6 @@
 "use client";
 import { useScroll, useTransform } from "motion/react";
 import React from "react";
-import { GoogleGeminiEffect } from "@/components/custom/GoogleGeminiEffect";
 import { Playfair_Display } from "next/font/google";
 
 const playfair_display = Playfair_Display({ subsets: ["latin"] });
@@ -39,11 +38,6 @@ export default function Home() {
 
       {/* 2️⃣ Dark Overlay */}
       <div className="absolute inset-0 bg-black/20 z-10" />
-
-      {/* 3️⃣ Google Gemini Effect */}
-      <div className="absolute inset-0 z-20 pointer-events-none">
-        <GoogleGeminiEffect pathLengths={pathLengths} />
-      </div>
 
       {/* 4️⃣ Text Content */}
       <div className="relative z-30 flex h-full items-center justify-center lg:justify-start">

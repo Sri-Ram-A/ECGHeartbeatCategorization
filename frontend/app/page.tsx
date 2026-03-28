@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-// import IntroSection from "@/components/IntroSection";
+// import IntroSection from "@/components/LightIntroSection";
 import IntroSection from "@/components/IntroSection";
 import WhatSection from "@/components/WhatSection";
 import { Inter } from "next/font/google";
